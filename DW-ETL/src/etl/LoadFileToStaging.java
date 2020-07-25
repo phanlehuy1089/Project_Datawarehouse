@@ -10,6 +10,7 @@ import check.CheckData;
 import connection_utils.MySQLConnectionUtils;
 import control.DBControlTool;
 import log.UpdateLog;
+import mail.SendMail;
 import model.InfoConfig;
 import model.Log;
 import tool.ConvertExcelToTxt;
@@ -65,6 +66,7 @@ public class LoadFileToStaging {
 				}
 				catch (IOException e) {
 					System.out.println("<---> ERROR [Format txt_file with delimiter ; ]: " + e.getMessage());
+					SendMail.sendMail("[idLog = " + idLog + "] [Format txt_file with delimiter ; ]: " + e.getMessage());
 					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
 					MoveFile.moveFile(fileLocalFullPath, failDir);
 					continue;
@@ -82,6 +84,7 @@ public class LoadFileToStaging {
 				}
 				catch (IOException | NullPointerException e) {
 					System.out.println("<---> ERROR [Convert excel_file to txt_file]: " + e.getMessage());
+					SendMail.sendMail("[idLog = " + idLog + "] [Convert excel_file to txt_file]: " + e.getMessage());
 					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
 					MoveFile.moveFile(fileLocalFullPath, failDir);
 					continue;
@@ -91,6 +94,7 @@ public class LoadFileToStaging {
 			default:
 				System.out.println(
 						"<---> ERROR [Load data into Staging] Không thể load file với định dạng này: " + dataFileType);
+				SendMail.sendMail("[idLog = " + idLog + "] [Không thể load file với định dạng này]: " + dataFileType);
 				UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
 				MoveFile.moveFile(fileLocalFullPath, failDir);
 				continue;
@@ -126,14 +130,15 @@ public class LoadFileToStaging {
 				} else {
 					TruncateTable.truncateTable(infoConfig, dbStagingName, "tb_staging_" + dataObject);
 					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
+					SendMail.sendMail("[idLog = " + idLog + "] [Lost data]: " + dataFileName + dataFileType);
 					MoveFile.moveFile(fileLocalFullPath, failDir);
 					continue;
 				}
 			} catch (SQLException e) {
 				TruncateTable.truncateTable(infoConfig, dbStagingName, "tb_staging_" + dataObject);
 				UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
-				System.out.println("<---> ERROR [Load data into Staging] [" + "Data file: " + dataFileName
-						+ dataFileType + "]: " + e.getMessage());
+				System.out.println("<---> ERROR [Load data into Staging] [Data file: " + dataFileName + dataFileType + "]: " + e.getMessage());
+				SendMail.sendMail("[idLog = " + idLog + "] [Load data into Staging] [Data file: " + dataFileName + dataFileType + "]: " + e.getMessage());
 				MoveFile.moveFile(fileLocalFullPath, failDir);
 				continue;
 			}

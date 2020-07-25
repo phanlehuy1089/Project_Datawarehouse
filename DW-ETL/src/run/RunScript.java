@@ -36,7 +36,7 @@ public class RunScript {
 
 	public static void main(String[] args) {
 		long millis1 = System.currentTimeMillis();
-		run(6);
+		run(12);
 		long millis2 = System.currentTimeMillis();
 		long distance = millis2 - millis1;
 
