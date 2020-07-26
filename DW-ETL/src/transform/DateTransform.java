@@ -3,14 +3,16 @@ package transform;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.poi.ss.usermodel.DateUtil;
+
 public class DateTransform {
-	public static void transformDate() {
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-		Date date = new Date();
-		String dateFormat = formatter.format(date);
-		System.out.println("Ngày đã được định dạng : " + dateFormat);
+	public static String transformDate(int dateInt) {
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+		Date javaDate = DateUtil.getJavaDate((double) dateInt);
+		String dateFormat = formatter.format(javaDate);
+		return dateFormat;
 	}
 	public static void main(String[] args) {
-		transformDate();
+		System.out.println(transformDate(35214));
 	}
 }

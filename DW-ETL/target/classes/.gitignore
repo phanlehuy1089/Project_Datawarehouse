@@ -1,3 +1,6 @@
 /META-INF/
 /mail/
 /etl/
+/run/
+/transform/
+/tool/

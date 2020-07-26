@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
 
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
@@ -17,18 +18,21 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import transform.DateTransform;
+
 public class ConvertExcelToTxt {
 
 	public static void main(String[] args) throws IOException {
 //		final String excelFilePath = "D:\\1\\sinhvien_chieu_nhom4.xlsx";
 //		String txtFilePath = "D:\\1\\sinhvien_chieu_nhom4_text.txt";
-		final String excelFilePath = "D:\\A\\sinhvien_chieu_nhom16.xlsx";
-		String txtFilePath = "D:\\A\\sinhvien_chieu_nhom16_2.txt";
+		final String excelFilePath = "D:\\A\\dangky_chieu_nhom4_2020.xlsx";
+		String txtFilePath = "D:\\A\\dangky_chieu_nhom4_2020.txt";
 		convertExcelToTxt(excelFilePath, txtFilePath, ";");
 	}
 
 	@SuppressWarnings("unused")
-	public static void convertExcelToTxt(String excelFilePath, String txtFilePath, String delimiter) throws IOException {
+	public static void convertExcelToTxt(String excelFilePath, String txtFilePath, String delimiter)
+			throws IOException {
 
 		File txtFile = new File(txtFilePath);
 		txtFile.createNewFile();
@@ -82,7 +86,12 @@ public class ConvertExcelToTxt {
 						data.append(delimiter + cell.getStringCellValue());
 						break;
 					case NUMERIC:
-						data.append(delimiter + (int) cell.getNumericCellValue());
+						if (HSSFDateUtil.isCellDateFormatted(cell)) {
+							String dateFormatted = DateTransform.transformDate((int) cell.getNumericCellValue());
+							data.append(delimiter + dateFormatted);
+						} else {
+							data.append(delimiter + (int) cell.getNumericCellValue());
+						}
 						break;
 					case BOOLEAN:
 						data.append(delimiter + cell.getBooleanCellValue());

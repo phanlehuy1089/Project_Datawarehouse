@@ -10,7 +10,7 @@ public class RunScript {
 	public static void run(int idConfig) {
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(idConfig);
 		String dataObject = infoConfig.getData_object();
-		System.out.println("\n\n<--------[LOAD DATA WITH OBJECT]: " + dataObject + " -------->\n");
+		System.out.println("\n<--------[LOAD DATA WITH OBJECT]: " + dataObject + " -------->\n");
 		String methodGetData = infoConfig.getMethodGetData();
 		switch (methodGetData) {
 		case "download":
