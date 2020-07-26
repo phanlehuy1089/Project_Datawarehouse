@@ -23,10 +23,10 @@ import transform.DateTransform;
 public class ConvertExcelToTxt {
 
 	public static void main(String[] args) throws IOException {
-//		final String excelFilePath = "D:\\1\\sinhvien_chieu_nhom4.xlsx";
-//		String txtFilePath = "D:\\1\\sinhvien_chieu_nhom4_text.txt";
-		final String excelFilePath = "D:\\A\\dangky_chieu_nhom4_2020.xlsx";
-		String txtFilePath = "D:\\A\\dangky_chieu_nhom4_2020.txt";
+		final String excelFilePath = "D:\\A\\sinhvien_chieu_nhom16.xlsx";
+		String txtFilePath = "D:\\A\\sinhvien_chieu_nhom16_text.txt";
+//		final String excelFilePath = "D:\\A\\dangky_chieu_nhom4_2020.xlsx";
+//		String txtFilePath = "D:\\A\\dangky_chieu_nhom4_2020.txt";
 		convertExcelToTxt(excelFilePath, txtFilePath, ";");
 	}
 
@@ -87,7 +87,7 @@ public class ConvertExcelToTxt {
 						break;
 					case NUMERIC:
 						if (HSSFDateUtil.isCellDateFormatted(cell)) {
-							String dateFormatted = DateTransform.transformDate((int) cell.getNumericCellValue());
+							String dateFormatted = DateTransform.transformDateInt((int) cell.getNumericCellValue());
 							data.append(delimiter + dateFormatted);
 						} else {
 							data.append(delimiter + (int) cell.getNumericCellValue());
