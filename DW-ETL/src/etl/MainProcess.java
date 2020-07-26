@@ -17,6 +17,7 @@ import tool.ConvertExcelToTxt;
 import tool.FormatDelimiterFileTxt;
 import tool.MoveFile;
 import tool.TruncateTable;
+import warehouse.LoadDataToWarehouse;
 import log.LogStatus;
 import log.LogUtil;
 
@@ -27,9 +28,11 @@ public class MainProcess {
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(idConfig);
 		String dataObject = infoConfig.getDataObject();
 		String dbStagingName = infoConfig.getDbStagingName();
+		String dbWarehouseName = infoConfig.getDbWarehouseName();
 		String fileSuccessDir = infoConfig.getFileSuccessDir();
 		String fileFailDir = infoConfig.getFileFailDir();
 		String fieldName = infoConfig.getFieldName();
+		String exclusiveField = infoConfig.getExclusiveField();
 //		String fieldFormat = infoConfig.getFieldFormat();
 
 		System.out.println("[LOAD DATA INTO STAGING]: tb_staging_" + dataObject + "\n--------------------------------------");
@@ -144,6 +147,11 @@ public class MainProcess {
 			}
 			TruncateTable.truncateTable(infoConfig, dbStagingName, "tb_staging_" + dataObject);
 		}
+		System.out.println("\n--------- LOAD DATA WITH OBJECT [" + dataObject + "] INTO WAREHOUSE " + dbWarehouseName + "---------");
+		String fieldsInWH = "s_key," + fieldName + ",date_expired";
+		String srcTableWH = "tb_wh_temp_" + dataObject;
+		String tarTableWH = "tb_wh_" + dataObject;	
+		LoadDataToWarehouse.loadDataToWarehouse(infoConfig, dbStagingName, dbWarehouseName, srcTableWH, tarTableWH, fieldsInWH, exclusiveField);
 	}
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {

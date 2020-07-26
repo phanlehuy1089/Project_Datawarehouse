@@ -48,7 +48,7 @@ public class LoadFileWithSCP {
 		String nasPass = infoConfig.getNasPassword();
 		success = ssh.AuthenticatePw(nasUserName, nasPass);
 		if (success != true) {
-			System.out.println("sai tên đăng nhập hoặc mật khẩu");
+			System.out.println("Sai tên đăng nhập hoặc mật khẩu");
 			return;
 		}
 		CkScp scp = new CkScp();
@@ -64,7 +64,7 @@ public class LoadFileWithSCP {
 		String localDirectory = infoConfig.getLocalDirectory();
 		success = scp.SyncTreeDownload(nasDirectory, localDirectory, 2, false);
 		if (success != true) {
-			System.out.println("remoteDir or localDir không tồn tại");
+			System.out.println("remoteDir hoặc localDir không tồn tại");
 			return;
 		}
 		System.out.println("Tải xuống thành công!\n");

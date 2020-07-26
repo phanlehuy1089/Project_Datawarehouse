@@ -17,7 +17,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/mysql-connector-java-8.0.20.jar"/>
-	<classpathentry kind="lib" path="lib/chilkat.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.54.jar"/>
+	<classpathentry kind="lib" path="lib/chilkat.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
