@@ -20,12 +20,12 @@ import tool.TruncateTable;
 import log.LogStatus;
 import log.LogUtil;
 
-public class LoadFileToStaging {
+public class MainProcess {
 
-	public static void loadDataToStaging(int idConfig) {
+	public static void loadDataWithConfigID(int idConfig) {
 		// Lấy thông tin config
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(idConfig);
-		String dataObject = infoConfig.getData_object();
+		String dataObject = infoConfig.getDataObject();
 		String dbStagingName = infoConfig.getDbStagingName();
 		String fileSuccessDir = infoConfig.getFileSuccessDir();
 		String fileFailDir = infoConfig.getFileFailDir();

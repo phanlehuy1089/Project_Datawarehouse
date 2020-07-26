@@ -17,9 +17,10 @@ public class InfoConfig {
 	String password;
 	String dbStagingName;
 	String dbWarehouseName;
-	String data_object;
+	String dataObject;
 	String fieldName;
 	String fieldFormat;
+	String exclusiveField;
 	String fileSuccessDir;
 	String fileFailDir;
 	String dtExpired;
@@ -31,8 +32,8 @@ public class InfoConfig {
 	public InfoConfig(int idConfig, String methodGetData, String nasHostName, int nasPortNumber, String nasUserName,
 			String nasPassword, String nasDirectory, String localDirectory, String classForName, String portName,
 			int portNumber, String hostName, String userName, String password, String dbStagingName,
-			String dbWarehouseName, String data_object, String fieldName, String fieldFormat, String fileSuccessDir,
-			String fileFailDir, String dtExpired) {
+			String dbWarehouseName, String dataObject, String fieldName, String fieldFormat, String exclusiveField,
+			String fileSuccessDir, String fileFailDir, String dtExpired) {
 		super();
 		this.idConfig = idConfig;
 		this.methodGetData = methodGetData;
@@ -50,14 +51,15 @@ public class InfoConfig {
 		this.password = password;
 		this.dbStagingName = dbStagingName;
 		this.dbWarehouseName = dbWarehouseName;
-		this.data_object = data_object;
+		this.dataObject = dataObject;
 		this.fieldName = fieldName;
 		this.fieldFormat = fieldFormat;
+		this.exclusiveField = exclusiveField;
 		this.fileSuccessDir = fileSuccessDir;
 		this.fileFailDir = fileFailDir;
 		this.dtExpired = dtExpired;
 	}
-
+	
 	public int getIdConfig() {
 		return idConfig;
 	}
@@ -186,12 +188,12 @@ public class InfoConfig {
 		this.dbWarehouseName = dbWarehouseName;
 	}
 
-	public String getData_object() {
-		return data_object;
+	public String getDataObject() {
+		return dataObject;
 	}
 
-	public void setData_object(String data_object) {
-		this.data_object = data_object;
+	public void setDataObject(String dataObject) {
+		this.dataObject = dataObject;
 	}
 
 	public String getFieldName() {
@@ -208,6 +210,14 @@ public class InfoConfig {
 
 	public void setFieldFormat(String fieldFormat) {
 		this.fieldFormat = fieldFormat;
+	}
+
+	public String getExclusiveField() {
+		return exclusiveField;
+	}
+
+	public void setExclusiveField(String exclusiveField) {
+		this.exclusiveField = exclusiveField;
 	}
 
 	public String getFileSuccessDir() {
@@ -236,15 +246,29 @@ public class InfoConfig {
 
 	@Override
 	public String toString() {
-		return "[InfoConfig] \n idConfig = " + idConfig + "\n methodGetData = " + methodGetData + "\n nasHostName = "
-				+ nasHostName + "\n nasPortNumber = " + nasPortNumber + "\n nasUserName = " + nasUserName
-				+ "\n nasPassword = " + nasPassword + "\n nasDirectory = " + nasDirectory + "\n localDirectory = "
-				+ localDirectory + "\n classForName = " + classForName + "\n portName = " + portName
-				+ "\n portNumber = " + portNumber + "\n hostName = " + hostName + "\n userName = " + userName
-				+ "\n password = " + password + "\n dbStagingName = " + dbStagingName + "\n dbWarehouseName = "
-				+ dbWarehouseName + "\n data_object = " + data_object + "\n fieldName = " + fieldName
-				+ "\n fieldFormat = " + fieldFormat + "\n fileSuccessDir = " + fileSuccessDir + "\n fileFailDir = "
-				+ fileFailDir + "\n dtExpired = " + dtExpired;
+		return "[InfoConfig] \n idConfig = " + idConfig 
+				+ "\n methodGetData = " + methodGetData 
+				+ "\n nasHostName = " + nasHostName 
+				+ "\n nasPortNumber = " + nasPortNumber 
+				+ "\n nasUserName = " + nasUserName
+				+ "\n nasPassword = " + nasPassword 
+				+ "\n nasDirectory = " + nasDirectory 
+				+ "\n localDirectory = " + localDirectory 
+				+ "\n classForName = " + classForName 
+				+ "\n portName = " + portName
+				+ "\n portNumber = " + portNumber 
+				+ "\n hostName = " + hostName 
+				+ "\n userName = " + userName
+				+ "\n password = " + password 
+				+ "\n dbStagingName = " + dbStagingName 
+				+ "\n dbWarehouseName = " + dbWarehouseName 
+				+ "\n dataObject = " + dataObject 
+				+ "\n fieldName = " + fieldName
+				+ "\n fieldFormat = " + fieldFormat 
+				+ "\n exclusiveField = " + exclusiveField 
+				+ "\n fileSuccessDir = " + fileSuccessDir 
+				+ "\n fileFailDir = " + fileFailDir 
+				+ "\n dtExpired = " + dtExpired;
 	}
 
 }

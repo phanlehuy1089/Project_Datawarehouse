@@ -35,9 +35,10 @@ public class DBControlTool {
 				infoConfig.setPassword(rs.getString("password"));
 				infoConfig.setDbStagingName(rs.getString("db_staging_name"));
 				infoConfig.setDbWarehouseName(rs.getString("db_warehouse_name"));
-				infoConfig.setData_object(rs.getString("data_object"));
+				infoConfig.setDataObject(rs.getString("data_object"));
 				infoConfig.setFieldName(rs.getString("field_name"));
 				infoConfig.setFieldFormat(rs.getString("field_format"));
+				infoConfig.setExclusiveField(rs.getString("exclusive_field"));
 				infoConfig.setFileSuccessDir(rs.getString("file_success_dir"));
 				infoConfig.setFileFailDir(rs.getString("file_fail_dir"));
 				infoConfig.setDtExpired(rs.getString("dt_expired"));

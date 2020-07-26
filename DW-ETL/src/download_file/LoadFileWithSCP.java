@@ -58,7 +58,7 @@ public class LoadFileWithSCP {
 			System.out.println(scp.lastErrorText());
 			return;
 		}
-		String dataObject = infoConfig.getData_object();
+		String dataObject = infoConfig.getDataObject();
 		scp.put_SyncMustMatch("" + dataObject + "*.*");
 		String nasDirectory = infoConfig.getNasDirectory();
 		String localDirectory = infoConfig.getLocalDirectory();

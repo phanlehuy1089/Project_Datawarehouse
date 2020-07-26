@@ -3,13 +3,13 @@ package run;
 import control.DBControlTool;
 import download_file.CreateInfoDataFile;
 import download_file.LoadFileWithSCP;
-import etl.LoadFileToStaging;
+import etl.MainProcess;
 import model.InfoConfig;
 
 public class RunScript {
 	public static void run(int idConfig) {
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(idConfig);
-		String dataObject = infoConfig.getData_object();
+		String dataObject = infoConfig.getDataObject();
 		System.out.println("\n<--------[LOAD DATA WITH OBJECT]: " + dataObject + " -------->\n");
 		String methodGetData = infoConfig.getMethodGetData();
 		switch (methodGetData) {
@@ -19,13 +19,13 @@ public class RunScript {
 			System.out.println("[Create list file data information]\n");
 			CreateInfoDataFile.insertInfoFileToTableLog(idConfig);
 			System.out.println("\n[Begin load data to STAGING]");
-			LoadFileToStaging.loadDataToStaging(idConfig);
+			MainProcess.loadDataWithConfigID(idConfig);
 			break;
 		case "local":
 			System.out.println("[Create list file data information]");
 			CreateInfoDataFile.insertInfoFileToTableLog(idConfig);
 			System.out.println("[Begin load data to STAGING]");
-			LoadFileToStaging.loadDataToStaging(idConfig);
+			MainProcess.loadDataWithConfigID(idConfig);
 			break;
 		default:
 			System.out.println(
