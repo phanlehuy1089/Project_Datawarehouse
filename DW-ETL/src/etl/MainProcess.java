@@ -145,6 +145,7 @@ public class MainProcess {
 				MoveFile.moveFile(fileLocalFullPath, failDir);
 				continue;
 			}
+			UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.SU);
 			TruncateTable.truncateTable(infoConfig, dbStagingName, "tb_staging_" + dataObject);
 		}
 		System.out.println("\n--------- LOAD DATA WITH OBJECT [" + dataObject + "] INTO WAREHOUSE " + dbWarehouseName + "---------");
