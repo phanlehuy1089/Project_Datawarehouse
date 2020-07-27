@@ -24,7 +24,7 @@ import log.LogUtil;
 public class MainProcess {
 
 	public static void loadDataWithConfigID(int idConfig) {
-		// Lấy thông tin config
+		// Get configuration information
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(idConfig);
 		String dataObject = infoConfig.getDataObject();
 		String dbStagingName = infoConfig.getDbStagingName();
@@ -37,7 +37,7 @@ public class MainProcess {
 
 		System.out.println("[LOAD DATA INTO STAGING]: tb_staging_" + dataObject + "\n--------------------------------------");
 		ArrayList<Log> listLog = LogUtil.getListLog(idConfig);
-		for (Log fileData : listLog) { // Lấy thông tin từng file trong Log
+		for (Log fileData : listLog) { // Get each file information from Log
 			System.out.println("--------------------------------------");
 			int idLog = fileData.getIdLog();
 			String fileLocalPath = fileData.getFileLocalPath();
@@ -47,17 +47,17 @@ public class MainProcess {
 
 			String fileLocalFullPath = fileLocalPath + "/" + dataFileName + dataFileType;
 
-			// Tạo 2 đường dẫn để di chuyển file sau khi extract thành công hoặc thất bại
+			// Create directory for failFile or successFile
 			String successDir = fileSuccessDir + "/" + dataFileName + dataFileType;
 			String failDir = fileFailDir + "/" + dataFileName + dataFileType;
 
 			int dataLinesInTable = 0;
 			
-			// Kết nối với Database Staging
+			// Connect to database Staging
 			Connection connection = MySQLConnectionUtils.getConnection(infoConfig, dbStagingName);
 			PreparedStatement ps;
 			
-			// Load file data với các định dạng khác nhau sử dụng switch case
+			// Load file with some fileTypes using SWITCH CASE
 			System.out.println("[Begin load data file] [idLog = " + idLog + "] " + dataFileName + dataFileType);
 			
 			String currentFile = "";
@@ -96,8 +96,8 @@ public class MainProcess {
 				break;
 			default:
 				System.out.println(
-						"<---> ERROR [Load data into Staging] Không thể load file với định dạng này: " + dataFileType);
-				SendMail.sendMail("[idLog = " + idLog + "] [Không thể load file với định dạng này]: " + dataFileType);
+						"<---> ERROR [Load data into Staging] Cannot load with this fileType: " + dataFileType);
+				SendMail.sendMail("[idLog = " + idLog + "] [Cannot load with this fileType]: " + dataFileType);
 				UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
 				MoveFile.moveFile(fileLocalFullPath, failDir);
 				continue;
@@ -120,10 +120,10 @@ public class MainProcess {
 				ps.executeUpdate();
 				connection.close();
 
-				// Đếm số dòng data sau khi Extract
+				// Count data lines after extract
 				dataLinesInTable = CheckData.numberDataLinesInTable(infoConfig, dbStagingName, "tb_staging_" + dataObject);
 				System.out.println("[Data lines after extract to Staging] [" + dataFileName + dataFileType + "]: " + dataLinesInTable);
-				// Update log khi load data vào staging thành công hoặc thất bại
+				// Update log when load data success or fail
 				if (dataLinesInTable >= 20) {
 					
 					LoadDataToWarehouseTemp.loadDataToWarehouseTemp(dbStagingName, infoConfig, fieldName, "tb_staging_" + dataObject, "tb_wh_temp_" + dataObject);

@@ -29,18 +29,26 @@ public class RunScript {
 			break;
 		default:
 			System.out.println(
-					"<---> ERROR [Method get data]: Không thể lấy dữ liệu với phương thức này: " + methodGetData);
+					"<---> ERROR [Method get data]: Cannot load data with this method: " + methodGetData);
 			break;
 		}
 	}
 
 	public static void main(String[] args) {
-		long millis1 = System.currentTimeMillis();
-		run(12);
-		long millis2 = System.currentTimeMillis();
-		long distance = millis2 - millis1;
-
-		System.out.println(
-				"--------------------------------------\n[TỔNG THỜI GIAN THỰC HIỆN]: " + distance + " milliseconds");
+		int firstArg;
+		if (args.length > 0) {
+		    try {
+		        firstArg = Integer.parseInt(args[0]);
+		        long millis1 = System.currentTimeMillis();
+				run(firstArg);
+				long millis2 = System.currentTimeMillis();
+				long distance = millis2 - millis1;
+				System.out.println(
+						"--------------------------------------\n[TOTAL TIME]: " + distance + " milliseconds");
+		    } catch (NumberFormatException e) {
+		        System.err.println("Argument" + args[0] + " must be an integer.");
+		        System.exit(1);
+		    }
+		}
 	}
 }

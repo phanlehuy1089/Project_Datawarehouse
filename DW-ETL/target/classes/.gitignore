@@ -2,3 +2,8 @@
 /run/
 /warehouse/
 /etl/
+/META-INF/
+/connection_utils/
+/control/
+/log/
+/tool/

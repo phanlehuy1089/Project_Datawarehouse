@@ -16,12 +16,12 @@ public class CreateTable {
 		String[] fieldNameArr = fieldName.split(",");
 		String[] fieldFormatArr = fieldFormat.split(",");
 		
-		// tạo field
+		// create field
 		String field = "";
 		for (int i = 0; i < fieldNameArr.length; i++) {
 			field += fieldNameArr[i] + " " + fieldFormatArr[i] + ", ";
 		}
-		// tạo sql create table
+		// create query create table
 		String sql = "CREATE TABLE IF NOT EXISTS " + dbName + "." + tbName + " (" + field + "PRIMARY KEY(" + fieldNameArr[0] +"))";		
 		try {
 			PreparedStatement ps = connection.prepareStatement(sql);

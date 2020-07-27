@@ -1,25 +1,12 @@
 package download_file;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-
 import com.chilkatsoft.CkGlobal;
 import com.chilkatsoft.CkScp;
 import com.chilkatsoft.CkSsh;
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
 
 import control.DBControlTool;
 import model.InfoConfig;
 
-@SuppressWarnings("unused")
 public class LoadFileWithSCP {
 	static {
 		try {
@@ -31,24 +18,24 @@ public class LoadFileWithSCP {
 	}
 	public static void downloadAllFile(InfoConfig infoConfig) {
 		CkGlobal ck = new CkGlobal();
-		ck.UnlockBundle("VUI LÒNG CHỜ....");
+		ck.UnlockBundle("WAIT....");
 		CkSsh ssh = new CkSsh();
-		// Kết nối đến sever
+		// Connect to server
 		String nasHostName = infoConfig.getNasHostName();
 		int nasPortNumber = infoConfig.getNasPortNumber();
 		boolean success = ssh.Connect(nasHostName, nasPortNumber);
 		if (success != true) {
-			System.out.println("Lỗi kết nối đến sever");
+			System.out.println("NAS: <Connected to Server failed!>");
 			return;
 		}
 		ssh.put_IdleTimeoutMs(5000);
 		
-		// Kiểm tra tài khoản
+		// Check account
 		String nasUserName = infoConfig.getNasUserName();
 		String nasPass = infoConfig.getNasPassword();
 		success = ssh.AuthenticatePw(nasUserName, nasPass);
 		if (success != true) {
-			System.out.println("Sai tên đăng nhập hoặc mật khẩu");
+			System.out.println("NAS: <Wrong userName or password>");
 			return;
 		}
 		CkScp scp = new CkScp();
@@ -64,14 +51,13 @@ public class LoadFileWithSCP {
 		String localDirectory = infoConfig.getLocalDirectory();
 		success = scp.SyncTreeDownload(nasDirectory, localDirectory, 2, false);
 		if (success != true) {
-			System.out.println("remoteDir hoặc localDir không tồn tại");
+			System.out.println("<---> ERROR [Download] remoteDir or localDir is not exist");
 			return;
 		}
-		System.out.println("Tải xuống thành công!\n");
+		System.out.println("Download success!\n");
 		ssh.Disconnect();
 	}
 
-	@SuppressWarnings("static-access")
 	public static void main(String argv[]) {
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(10);
 		downloadAllFile(infoConfig);

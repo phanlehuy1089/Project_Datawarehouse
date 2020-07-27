@@ -4,11 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import model.InfoConfig;
 
-// Class dùng để lấy thông tin Config từ Database Control (table config)
 public class DBControlTool {
 	public static InfoConfig getInfoConfig(int idConfig) {
 		InfoConfig infoConfig = new InfoConfig();
