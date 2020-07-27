@@ -1,9 +1,3 @@
-/download_file/
-/run/
-/warehouse/
-/etl/
 /META-INF/
-/connection_utils/
-/control/
-/log/
-/tool/
+/download_file/
+/check/

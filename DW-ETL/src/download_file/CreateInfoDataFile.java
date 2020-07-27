@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import check.CheckDuplicate;
 import connection_utils.MySQLConnectionUtils;
 import control.DBControlTool;
 import log.LogStatus;
@@ -70,8 +71,8 @@ public class CreateInfoDataFile {
 	}
 
 	public static void main(String[] args) throws IOException {
-
+		InfoConfig ic = DBControlTool.getInfoConfig(6);
 		insertInfoFileToTableLog(6);
-
+		CheckDuplicate.mergeDataDuplicate(ic, "tb_log"	, "file_name");
 	}
 }
