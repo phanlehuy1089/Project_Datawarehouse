@@ -9,31 +9,27 @@ import model.InfoConfig;
 public class RunScript {
 	public static void run(int idConfig) {
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(idConfig);
-		String dataObject = infoConfig.getDataObject();
-		System.out.println("\n<--------[LOAD DATA WITH OBJECT]: " + dataObject + " -------->\n");
 		String methodGetData = infoConfig.getMethodGetData();
 		switch (methodGetData) {
 		case "download":
 			System.out.println("[Begin download...]");
 			LoadFileWithSCP.downloadAllFile(infoConfig);
-			System.out.println("[Create list file data information]\n");
+			System.out.println("[Create list file data information]");
 			CreateInfoDataFile.insertInfoFileToTableLog(idConfig);
-			System.out.println("\n[Begin load data to STAGING]");
+			// Execute main process
 			MainProcess.loadDataWithConfigID(idConfig);
 			break;
 		case "local":
 			System.out.println("[Create list file data information]");
 			CreateInfoDataFile.insertInfoFileToTableLog(idConfig);
-			System.out.println("[Begin load data to STAGING]");
+			// Execute main process
 			MainProcess.loadDataWithConfigID(idConfig);
 			break;
 		default:
-			System.out.println(
-					"<---> ERROR [Method get data]: Cannot load data with this method: " + methodGetData);
+			System.out.println("<---> ERROR [Method get data]: Cannot load data with this method: " + methodGetData);
 			break;
 		}
 	}
-
 	public static void main(String[] args) {
 		int firstArg;
 		if (args.length > 0) {
@@ -43,10 +39,9 @@ public class RunScript {
 				run(firstArg);
 				long millis2 = System.currentTimeMillis();
 				long distance = millis2 - millis1;
-				System.out.println(
-						"--------------------------------------\n[TOTAL TIME]: " + distance + " milliseconds");
+				System.out.println("\n <End> [PROCESS TOTAL TIME]: " + distance + " milliseconds");
 		    } catch (NumberFormatException e) {
-		        System.err.println("Argument" + args[0] + " must be an integer.");
+		        System.err.println("Argument <idConfig> " + args[0] + " must be an integer.");
 		        System.exit(1);
 		    }
 		}

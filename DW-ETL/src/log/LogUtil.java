@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import control.ConnectDBControlUtils;
+import mail.SendMail;
 import model.Log;
 
 public class LogUtil {
@@ -37,8 +38,8 @@ public class LogUtil {
 		}
 		catch (SQLException e) {
 			System.out.println("<---> ERROR [Get information from table Log]: " + e.getMessage());
+			SendMail.sendMail("<---> ERROR [Get information from table Log]: " + e.getMessage());
 		}
-		System.out.println("[Get information from table Log]");
 		return listLog;
 	}
 	public static void main(String[] args) {

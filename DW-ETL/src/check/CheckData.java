@@ -31,27 +31,25 @@ public class CheckData {
 		return dataLines - 1;
 	}
 
-	public static int numberDataLinesInTable(InfoConfig infoConfig, String dbName, String tbName) {
+	public static int numberDataLinesInTable(Connection connection, String dbName, String tbName) {
 		int dataLinesInTable = 0;
 		try {
-			Connection connection = MySQLConnectionUtils.getConnection(infoConfig, dbName);
+//			Connection connection = MySQLConnectionUtils.getConnection(infoConfig, dbName);
 			Statement s = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			String sql = "SELECT * FROM " + tbName;
 			ResultSet rSet = s.executeQuery(sql);
 			rSet.last();
 			dataLinesInTable = rSet.getRow();
 			rSet.beforeFirst();
-			connection.close();
 		} catch (SQLException e) {
 			System.out.println("<---> ERROR [Check number of data lines after extract to Staging]: " + e.getMessage());
 		}
 		return dataLinesInTable;
 	}
 
-	public static boolean checkSum(InfoConfig infoConfig, String dbName, String tbName, String filePath) {
+	public static boolean checkSum(Connection connection, String dbName, String tbName, int dataLinesInFile) {
 		boolean result = false;
-		int dataLinesInFile = CheckData.numberDataLinesIgnoreFirst(filePath);
-		int dataLinesInTable = CheckData.numberDataLinesInTable(infoConfig, dbName, tbName);
+		int dataLinesInTable = CheckData.numberDataLinesInTable(connection, dbName, tbName);
 		if (dataLinesInTable == dataLinesInFile) {
 			System.out.println("[Number of data lines after extract to Staging]: " + dataLinesInTable);
 			System.out.println("[Check sum] = true");
@@ -62,5 +60,10 @@ public class CheckData {
 		}
 		return result;
 	}
-
+	public static void main(String[] args) {
+		long t1 = System.currentTimeMillis();
+		int num =  numberDataLinesIgnoreFirst("D:\\A\\sinhvien_chieu_nhom16_text.txt");
+		long t2 = System.currentTimeMillis();
+		System.out.println(num + " " + (t2 - t1));
+	}
 }

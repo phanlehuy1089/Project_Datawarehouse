@@ -54,7 +54,7 @@ public class LoadFileWithSCP {
 			System.out.println("<---> ERROR [Download] remoteDir or localDir is not exist");
 			return;
 		}
-		System.out.println("Download success!\n");
+		System.out.println("Download success!");
 		ssh.Disconnect();
 	}
 

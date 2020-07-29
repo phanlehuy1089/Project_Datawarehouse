@@ -4,13 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import connection_utils.MySQLConnectionUtils;
-import control.DBControlTool;
-import model.InfoConfig;
+import control.ConnectDBControlUtils;
 
 public class CheckDuplicate {
-	public static void mergeDataDuplicate(InfoConfig infoConfig, String tbName, String fileName) {
-		Connection connection = MySQLConnectionUtils.getConnection(infoConfig, "db_control_etl");
+	public static void mergeDataDuplicate(String tbName, String fileName) {
+		Connection connection = ConnectDBControlUtils.getDBControlConnection();
 		String sql = "DELETE l1 FROM "+tbName+" l1\r\n" + 
 				"INNER JOIN "+tbName+" l2\r\n" + 
 				"WHERE\r\n" + 
@@ -27,7 +25,4 @@ public class CheckDuplicate {
 			}
 		
 	}
-//	public static void main(String[] args) {
-//		CheckDuplicate.mergeDataDuplicate(infoConfig, tbName, fileName);
-//	}
 }

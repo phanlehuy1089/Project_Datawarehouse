@@ -21,6 +21,7 @@ public class InfoConfig {
 	String fieldName;
 	String fieldFormat;
 	String exclusiveField;
+	String fieldDelimiter;
 	String fileSuccessDir;
 	String fileFailDir;
 	String dtExpired;
@@ -33,7 +34,7 @@ public class InfoConfig {
 			String nasPassword, String nasDirectory, String localDirectory, String classForName, String portName,
 			int portNumber, String hostName, String userName, String password, String dbStagingName,
 			String dbWarehouseName, String dataObject, String fieldName, String fieldFormat, String exclusiveField,
-			String fileSuccessDir, String fileFailDir, String dtExpired) {
+			String fieldDelimiter, String fileSuccessDir, String fileFailDir, String dtExpired) {
 		super();
 		this.idConfig = idConfig;
 		this.methodGetData = methodGetData;
@@ -55,11 +56,12 @@ public class InfoConfig {
 		this.fieldName = fieldName;
 		this.fieldFormat = fieldFormat;
 		this.exclusiveField = exclusiveField;
+		this.fieldDelimiter = fieldDelimiter;
 		this.fileSuccessDir = fileSuccessDir;
 		this.fileFailDir = fileFailDir;
 		this.dtExpired = dtExpired;
 	}
-	
+
 	public int getIdConfig() {
 		return idConfig;
 	}
@@ -220,6 +222,14 @@ public class InfoConfig {
 		this.exclusiveField = exclusiveField;
 	}
 
+	public String getFieldDelimiter() {
+		return fieldDelimiter;
+	}
+
+	public void setFieldDelimiter(String fieldDelimiter) {
+		this.fieldDelimiter = fieldDelimiter;
+	}
+
 	public String getFileSuccessDir() {
 		return fileSuccessDir;
 	}
@@ -266,6 +276,7 @@ public class InfoConfig {
 				+ "\n fieldName = " + fieldName
 				+ "\n fieldFormat = " + fieldFormat 
 				+ "\n exclusiveField = " + exclusiveField 
+				+ "\n fieldDelimiter = " + fieldDelimiter 
 				+ "\n fileSuccessDir = " + fileSuccessDir 
 				+ "\n fileFailDir = " + fileFailDir 
 				+ "\n dtExpired = " + dtExpired;

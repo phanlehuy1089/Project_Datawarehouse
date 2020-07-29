@@ -37,6 +37,7 @@ public class DBControlTool {
 				infoConfig.setFieldName(rs.getString("field_name"));
 				infoConfig.setFieldFormat(rs.getString("field_format"));
 				infoConfig.setExclusiveField(rs.getString("exclusive_field"));
+				infoConfig.setFieldDelimiter(rs.getString("field_delimiter"));
 				infoConfig.setFileSuccessDir(rs.getString("file_success_dir"));
 				infoConfig.setFileFailDir(rs.getString("file_fail_dir"));
 				infoConfig.setDtExpired(rs.getString("dt_expired"));
@@ -49,6 +50,6 @@ public class DBControlTool {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(DBControlTool.getInfoConfig(6));
+		System.out.println(DBControlTool.getInfoConfig(1));
 	}
 }

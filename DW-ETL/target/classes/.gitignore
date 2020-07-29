@@ -1,3 +1,10 @@
 /META-INF/
 /download_file/
 /check/
+/etl/
+/log/
+/run/
+/mail/
+/model/
+/control/
+/tool/

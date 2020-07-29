@@ -29,7 +29,8 @@ public class CreateInfoDataFile {
 	public static void insertInfoFileToTableLog(int idConfig) {
 
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(idConfig);
-
+		String fieldDelimiter = infoConfig.getFieldDelimiter();
+		
 		String localDir = infoConfig.getLocalDirectory();
 //		idConfig = infoConfig.getIdConfig();
 
@@ -43,13 +44,13 @@ public class CreateInfoDataFile {
 				File file = new File(localDir + "/" + fileInfo);
 
 				String loadStatus;
-				String[] fileArr = fileInfo.split("\\."); // chia [filename][filetype]
+				String[] fileArr = fileInfo.split("\\."); // split [filename].[filetype]
 				ps.setInt(1, 0);
 				ps.setInt(2, idConfig);
 				ps.setString(3, localDir);
 				ps.setString(4, fileArr[0]);
 				ps.setString(5, "." + fileArr[1]);
-				ps.setString(6, ";");
+				ps.setString(6, fieldDelimiter);
 				ps.setInt(7, 0);
 				if (file.exists()) {
 					loadStatus = LogStatus.ER;
@@ -73,6 +74,6 @@ public class CreateInfoDataFile {
 	public static void main(String[] args) throws IOException {
 		InfoConfig ic = DBControlTool.getInfoConfig(6);
 		insertInfoFileToTableLog(6);
-		CheckDuplicate.mergeDataDuplicate(ic, "tb_log"	, "file_name");
+		CheckDuplicate.mergeDataDuplicate("tb_log"	, "file_name");
 	}
 }

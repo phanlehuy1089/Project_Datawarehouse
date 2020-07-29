@@ -19,7 +19,7 @@ public class SendMail {
 			email.setSubject("[ETL PROCESS PROBLEM]");
 			email.setMsg(content);
 			email.send();
-			System.out.println("Message sent successfully");
+			System.out.println("\nMessage sent successfully");
 		} catch (EmailException e) {
 			System.out.println("<---> ERROR [Send mail]: " + e.getMessage());
 		}    

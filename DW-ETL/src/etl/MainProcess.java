@@ -33,29 +33,39 @@ public class MainProcess {
 		String fileFailDir = infoConfig.getFileFailDir();
 		String fieldName = infoConfig.getFieldName();
 		String exclusiveField = infoConfig.getExclusiveField();
-//		String fieldFormat = infoConfig.getFieldFormat();
-
-		System.out.println("[LOAD DATA INTO STAGING]: tb_staging_" + dataObject + "\n--------------------------------------");
+		String fieldDelimiter = infoConfig.getFieldDelimiter();
+		String dateExpired = infoConfig.getDtExpired();
+		String tbStagingName = "tb_staging_" + dataObject;
+		String tbWarehouseTempName = "tb_wh_temp_" + dataObject;
+		// Note errorLogs
+		StringBuffer contentError = new StringBuffer();
+		contentError.append("[idConfig = " + idConfig + "]\n--------------------\n");
+		// Get connection with databaseStaging
+		Connection connectionStaging = MySQLConnectionUtils.getConnection(infoConfig, dbStagingName);
+		PreparedStatement ps;
+		// Start process
+		System.out.println("\n\n[EXECUTE ETL PROCESS] [dataObject = " + dataObject + "] [idConfig = " + idConfig + "]\n");
+		System.out.println("<p1> [Begin load data into Staging]...");
+		System.out.println("[Get information dataFiles]\n");
 		ArrayList<Log> listLog = LogUtil.getListLog(idConfig);
 		for (Log fileData : listLog) { // Get each file information from Log
-			System.out.println("--------------------------------------");
+			System.out.println("-----------------------------------------------------------------");
 			int idLog = fileData.getIdLog();
 			String fileLocalPath = fileData.getFileLocalPath();
 			String dataFileName = fileData.getFileName();
 			String dataFileType = fileData.getFileType();
-			String dataFileDelimiter = fileData.getFileDelimiter();
 
 			String fileLocalFullPath = fileLocalPath + "/" + dataFileName + dataFileType;
 
-			// Create directory for failFile or successFile
+			// Create file path for failFile or successFile
 			String successDir = fileSuccessDir + "/" + dataFileName + dataFileType;
 			String failDir = fileFailDir + "/" + dataFileName + dataFileType;
-
+			
 			int dataLinesInTable = 0;
 			
 			// Connect to database Staging
-			Connection connection = MySQLConnectionUtils.getConnection(infoConfig, dbStagingName);
-			PreparedStatement ps;
+//			Connection connection = MySQLConnectionUtils.getConnection(infoConfig, dbStagingName);
+//			PreparedStatement ps;
 			
 			// Load file with some fileTypes using SWITCH CASE
 			System.out.println("[Begin load data file] [idLog = " + idLog + "] " + dataFileName + dataFileType);
@@ -65,11 +75,11 @@ public class MainProcess {
 			case ".txt":
 				String txtFilePathTC = "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/txtConvert/" + dataFileName + "_tc_" + idLog + ".txt";
 				try {
-					FormatDelimiterFileTxt.formatFileTxt(fileLocalFullPath, txtFilePathTC, ";");
+					FormatDelimiterFileTxt.formatFileTxt(fileLocalFullPath, txtFilePathTC, fieldDelimiter);
 				}
 				catch (IOException e) {
 					System.out.println("<---> ERROR [Format txt_file with delimiter ; ]: " + e.getMessage());
-					SendMail.sendMail("[idLog = " + idLog + "] [Format txt_file with delimiter ; ]: " + e.getMessage());
+					contentError.append("[idLog = " + idLog + "] [Format txt_file with delimiter ; ]: " + e.getMessage() + "\n");
 					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
 					MoveFile.moveFile(fileLocalFullPath, failDir);
 					continue;
@@ -83,11 +93,11 @@ public class MainProcess {
 			case ".xlsx":
 				String txtFilePath = "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/txtConvert/" + dataFileName + "_ec_" + idLog + ".txt";
 				try {
-					ConvertExcelToTxt.convertExcelToTxt(fileLocalFullPath, txtFilePath, ";");
+					ConvertExcelToTxt.convertExcelToTxt(fileLocalFullPath, txtFilePath, fieldDelimiter);
 				}
 				catch (IOException | NullPointerException e) {
 					System.out.println("<---> ERROR [Convert excel_file to txt_file]: " + e.getMessage());
-					SendMail.sendMail("[idLog = " + idLog + "] [Convert excel_file to txt_file]: " + e.getMessage());
+					contentError.append("[idLog = " + idLog + "] [Convert excel_file to txt_file]: " + e.getMessage() + "\n");
 					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
 					MoveFile.moveFile(fileLocalFullPath, failDir);
 					continue;
@@ -95,9 +105,8 @@ public class MainProcess {
 				currentFile = txtFilePath;
 				break;
 			default:
-				System.out.println(
-						"<---> ERROR [Load data into Staging] Cannot load with this fileType: " + dataFileType);
-				SendMail.sendMail("[idLog = " + idLog + "] [Cannot load with this fileType]: " + dataFileType);
+				System.out.println("<---> ERROR [Load data into Staging] Cannot load with this fileType: " + dataFileType);
+				contentError.append("[idLog = " + idLog + "] [Cannot load with this fileType]: " + dataFileType + "\n");
 				UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
 				MoveFile.moveFile(fileLocalFullPath, failDir);
 				continue;
@@ -107,54 +116,61 @@ public class MainProcess {
 			 Load data in file with current file path 
 			 */
 			
+			int dataLinesInFile = CheckData.numberDataLinesIgnoreFirst(currentFile);
+			
 			String sql = "LOAD DATA INFILE '" + currentFile + "' " 
-					+ "INTO TABLE tb_staging_" + dataObject
+					+ "INTO TABLE " + tbStagingName
 					+ " CHARACTER SET 'utf8' " 
-					+ "FIELDS TERMINATED BY '" + dataFileDelimiter + "' "
+					+ "FIELDS TERMINATED BY '" + fieldDelimiter + "' "
 					+ "ENCLOSED BY '\"' " 
 					+ "LINES TERMINATED BY '\\r\\n' " 
 					+ "IGNORE 1 LINES " 
 					+ "(" + fieldName + ");";
 			try {
-				ps = connection.prepareStatement(sql);
+				ps = connectionStaging.prepareStatement(sql);
 				ps.executeUpdate();
-				connection.close();
+//				connection.close();
 
 				// Count data lines after extract
-				dataLinesInTable = CheckData.numberDataLinesInTable(infoConfig, dbStagingName, "tb_staging_" + dataObject);
+				dataLinesInTable = CheckData.numberDataLinesInTable(connectionStaging, dbStagingName, tbStagingName);
 				System.out.println("[Data lines after extract to Staging] [" + dataFileName + dataFileType + "]: " + dataLinesInTable);
 				// Update log when load data success or fail
-				if (dataLinesInTable >= 20) {
-					
-					LoadDataToWarehouseTemp.loadDataToWarehouseTemp(dbStagingName, infoConfig, fieldName, "tb_staging_" + dataObject, "tb_wh_temp_" + dataObject);
-
+				if (dataLinesInTable == dataLinesInFile) {
+					// Begin load data to Warehouse temp
+					LoadDataToWarehouseTemp.loadDataToWarehouseTemp(connectionStaging, dbStagingName, fieldName, tbStagingName, tbWarehouseTempName, dateExpired);
 					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.TR);
 					MoveFile.moveFile(fileLocalFullPath, successDir);
 				} else {
-					TruncateTable.truncateTable(infoConfig, dbStagingName, "tb_staging_" + dataObject);
+					TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
+					System.out.println("<---> ERROR [Missing data after extract to staging]: " + dataFileName + dataFileType);
+					contentError.append("[idLog = " + idLog + "] [Missing data after extract to staging]: " + dataFileName + dataFileType + "\n");
 					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
-					SendMail.sendMail("[idLog = " + idLog + "] [Lost data]: " + dataFileName + dataFileType);
 					MoveFile.moveFile(fileLocalFullPath, failDir);
 					continue;
 				}
 			} catch (SQLException e) {
-				TruncateTable.truncateTable(infoConfig, dbStagingName, "tb_staging_" + dataObject);
-				UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
+				TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
 				System.out.println("<---> ERROR [Load data into Staging] [Data file: " + dataFileName + dataFileType + "]: " + e.getMessage());
-				SendMail.sendMail("[idLog = " + idLog + "] [Load data into Staging] [Data file: " + dataFileName + dataFileType + "]: " + e.getMessage());
+				contentError.append("[idLog = " + idLog + "] [Load data into Staging] [Data file: " + dataFileName + dataFileType + "]: " + e.getMessage() + "\n");
+				UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
 				MoveFile.moveFile(fileLocalFullPath, failDir);
 				continue;
 			}
 			UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.SU);
-			TruncateTable.truncateTable(infoConfig, dbStagingName, "tb_staging_" + dataObject);
+			TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
 		}
-		System.out.println("\n--------- LOAD DATA WITH OBJECT [" + dataObject + "] INTO WAREHOUSE " + dbWarehouseName + "---------");
+		// Close connection
+		try {
+			connectionStaging.close();
+		} catch (SQLException e) {
+			System.out.println("<---> ERROR [Close connection]: " + e.getMessage());
+		}
+		SendMail.sendMail(contentError.toString());
+		System.out.println("\n<p2> [Begin load data into Warehouse...]");
 		String fieldsInWH = "s_key," + fieldName + ",date_expired";
-		String srcTableWH = "tb_wh_temp_" + dataObject;
 		String tarTableWH = "tb_wh_" + dataObject;	
-		LoadDataToWarehouse.loadDataToWarehouse(infoConfig, dbStagingName, dbWarehouseName, srcTableWH, tarTableWH, fieldsInWH, exclusiveField);
+		LoadDataToWarehouse.loadDataToWarehouse(infoConfig, dbStagingName, dbWarehouseName, tbWarehouseTempName, tarTableWH, fieldsInWH, exclusiveField);
 	}
-
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
 		
 	}
