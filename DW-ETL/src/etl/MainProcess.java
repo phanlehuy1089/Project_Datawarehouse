@@ -44,120 +44,124 @@ public class MainProcess {
 		Connection connectionStaging = MySQLConnectionUtils.getConnection(infoConfig, dbStagingName);
 		PreparedStatement ps;
 		// Start process
-		System.out.println("\n\n[EXECUTE ETL PROCESS] [dataObject = " + dataObject + "] [idConfig = " + idConfig + "]\n");
-		System.out.println("<p1> [Begin load data into Staging]...");
-		System.out.println("[Get information dataFiles]\n");
+		System.out.println("\n[EXECUTE ETL PROCESS] [dataObject = " + dataObject + "] [idConfig = " + idConfig + "]\n");
+		System.out.println("<p1> [Load Data Into Staging]");
 		ArrayList<Log> listLog = LogUtil.getListLog(idConfig);
-		for (Log fileData : listLog) { // Get each file information from Log
-			System.out.println("-----------------------------------------------------------------");
-			int idLog = fileData.getIdLog();
-			String fileLocalPath = fileData.getFileLocalPath();
-			String dataFileName = fileData.getFileName();
-			String dataFileType = fileData.getFileType();
+		if (listLog.size() > 0) {
+			for (Log fileData : listLog) { // Get each file information from Log
+				System.out.println("-----------------------------");
+				int idLog = fileData.getIdLog();
+				String fileLocalPath = fileData.getFileLocalPath();
+				String dataFileName = fileData.getFileName();
+				String dataFileType = fileData.getFileType();
 
-			String fileLocalFullPath = fileLocalPath + "/" + dataFileName + dataFileType;
+				String fileLocalFullPath = fileLocalPath + "/" + dataFileName + dataFileType;
 
-			// Create file path for failFile or successFile
-			String successDir = fileSuccessDir + "/" + dataFileName + dataFileType;
-			String failDir = fileFailDir + "/" + dataFileName + dataFileType;
-			
-			int dataLinesInTable = 0;
-			
-			// Connect to database Staging
-//			Connection connection = MySQLConnectionUtils.getConnection(infoConfig, dbStagingName);
-//			PreparedStatement ps;
-			
-			// Load file with some fileTypes using SWITCH CASE
-			System.out.println("[Begin load data file] [idLog = " + idLog + "] " + dataFileName + dataFileType);
-			
-			String currentFile = "";
-			switch (dataFileType) {
-			case ".txt":
-				String txtFilePathTC = "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/txtConvert/" + dataFileName + "_tc_" + idLog + ".txt";
-				try {
-					FormatDelimiterFileTxt.formatFileTxt(fileLocalFullPath, txtFilePathTC, fieldDelimiter);
-				}
-				catch (IOException e) {
-					System.out.println("<---> ERROR [Format txt_file with delimiter ; ]: " + e.getMessage());
-					contentError.append("[idLog = " + idLog + "] [Format txt_file with delimiter ; ]: " + e.getMessage() + "\n");
-					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
-					MoveFile.moveFile(fileLocalFullPath, failDir);
-					continue;
-				}
-				currentFile = txtFilePathTC;
-				break;
-			case ".csv":
-				currentFile = fileLocalFullPath;
-				break;
-			case ".xls":
-			case ".xlsx":
-				String txtFilePath = "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/txtConvert/" + dataFileName + "_ec_" + idLog + ".txt";
-				try {
-					ConvertExcelToTxt.convertExcelToTxt(fileLocalFullPath, txtFilePath, fieldDelimiter);
-				}
-				catch (IOException | NullPointerException e) {
-					System.out.println("<---> ERROR [Convert excel_file to txt_file]: " + e.getMessage());
-					contentError.append("[idLog = " + idLog + "] [Convert excel_file to txt_file]: " + e.getMessage() + "\n");
-					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
-					MoveFile.moveFile(fileLocalFullPath, failDir);
-					continue;
-				}
-				currentFile = txtFilePath;
-				break;
-			default:
-				System.out.println("<---> ERROR [Load data into Staging] Cannot load with this fileType: " + dataFileType);
-				contentError.append("[idLog = " + idLog + "] [Cannot load with this fileType]: " + dataFileType + "\n");
-				UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
-				MoveFile.moveFile(fileLocalFullPath, failDir);
-				continue;
-			}
-			
-			/*
-			 Load data in file with current file path 
-			 */
-			
-			int dataLinesInFile = CheckData.numberDataLinesIgnoreFirst(currentFile);
-			
-			String sql = "LOAD DATA INFILE '" + currentFile + "' " 
-					+ "INTO TABLE " + tbStagingName
-					+ " CHARACTER SET 'utf8' " 
-					+ "FIELDS TERMINATED BY '" + fieldDelimiter + "' "
-					+ "ENCLOSED BY '\"' " 
-					+ "LINES TERMINATED BY '\\r\\n' " 
-					+ "IGNORE 1 LINES " 
-					+ "(" + fieldName + ");";
-			try {
-				ps = connectionStaging.prepareStatement(sql);
-				ps.executeUpdate();
-//				connection.close();
+				// Create file path for failFile or successFile
+				String successDir = fileSuccessDir + "/" + dataFileName + dataFileType;
+				String failDir = fileFailDir + "/" + dataFileName + dataFileType;
 
-				// Count data lines after extract
-				dataLinesInTable = CheckData.numberDataLinesInTable(connectionStaging, dbStagingName, tbStagingName);
-				System.out.println("[Data lines after extract to Staging] [" + dataFileName + dataFileType + "]: " + dataLinesInTable);
-				// Update log when load data success or fail
-				if (dataLinesInTable == dataLinesInFile) {
-					// Begin load data to Warehouse temp
-					LoadDataToWarehouseTemp.loadDataToWarehouseTemp(connectionStaging, dbStagingName, fieldName, tbStagingName, tbWarehouseTempName, dateExpired);
-					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.TR);
-					MoveFile.moveFile(fileLocalFullPath, successDir);
-				} else {
-					TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
-					System.out.println("<---> ERROR [Missing data after extract to staging]: " + dataFileName + dataFileType);
-					contentError.append("[idLog = " + idLog + "] [Missing data after extract to staging]: " + dataFileName + dataFileType + "\n");
+				int dataLinesInTable = 0;
+
+				// Load file with some fileTypes using SWITCH CASE
+				System.out.println("[Begin Load Data File] [idLog = " + idLog + "] " + dataFileName + dataFileType);
+
+				String currentFile = "";
+				switch (dataFileType) {
+				case ".txt":
+					String txtFilePathTC = "D:/MySQLFile/txtConvert/" + dataFileName + "_tc_" + idLog + ".txt";
+					try {
+						FormatDelimiterFileTxt.formatFileTxt(fileLocalFullPath, txtFilePathTC, fieldDelimiter);
+					} catch (IOException e) {
+						System.out.println("<---> ERROR [Format txt_file with delimiter ; ]: " + e.getMessage());
+						contentError.append("[idLog = " + idLog + "] [Format txt_file with delimiter ; ]: "
+								+ e.getMessage() + "\n");
+						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
+						MoveFile.moveFile(fileLocalFullPath, failDir);
+						continue;
+					}
+					currentFile = txtFilePathTC;
+					break;
+				case ".csv":
+					currentFile = fileLocalFullPath;
+					break;
+				case ".xls":
+				case ".xlsx":
+					String txtFilePath = "D:/MySQLFile/txtConvert/" + dataFileName + "_ec_" + idLog + ".txt";
+					try {
+						ConvertExcelToTxt.convertExcelToTxt(fileLocalFullPath, txtFilePath, fieldDelimiter);
+					} catch (IOException | NullPointerException e) {
+						System.out.println("<---> ERROR [Convert excel_file to txt_file]: " + e.getMessage());
+						contentError.append(
+								"[idLog = " + idLog + "] [Convert excel_file to txt_file]: " + e.getMessage() + "\n");
+						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
+						MoveFile.moveFile(fileLocalFullPath, failDir);
+						continue;
+					}
+					currentFile = txtFilePath;
+					break;
+				default:
+					System.out.println(
+							"<---> ERROR [Load data into Staging] Cannot load with this fileType: " + dataFileType);
+					contentError
+							.append("[idLog = " + idLog + "] [Cannot load with this fileType]: " + dataFileType + "\n");
 					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
 					MoveFile.moveFile(fileLocalFullPath, failDir);
 					continue;
 				}
-			} catch (SQLException e) {
+
+				/*
+				 * Load data in file with current file path
+				 */
+
+				int dataLinesInFile = CheckData.numberDataLinesIgnoreFirst(currentFile);
+
+				String sql = "LOAD DATA INFILE '" + currentFile + "' " + "INTO TABLE " + tbStagingName
+						+ " CHARACTER SET 'utf8' " + "FIELDS TERMINATED BY '" + fieldDelimiter + "' "
+						+ "ENCLOSED BY '\"' " + "LINES TERMINATED BY '\\r\\n' " + "IGNORE 1 LINES " + "(" + fieldName
+						+ ");";
+				try {
+					ps = connectionStaging.prepareStatement(sql);
+					ps.executeUpdate();
+//				connection.close();
+
+					// Count data lines after extract
+					dataLinesInTable = CheckData.numberDataLinesInTable(connectionStaging, dbStagingName,
+							tbStagingName);
+					System.out.println("[Data lines after extract to Staging] [" + dataFileName + dataFileType + "]: "
+							+ dataLinesInTable);
+					// Update log when load data success or fail
+					if (dataLinesInTable == dataLinesInFile) {
+						// Begin load data to Warehouse temp
+						LoadDataToWarehouseTemp.loadDataToWarehouseTemp(connectionStaging, dbStagingName, fieldName,
+								tbStagingName, tbWarehouseTempName, dateExpired);
+						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.TR);
+						MoveFile.moveFile(fileLocalFullPath, successDir);
+					} else {
+						TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
+						System.out.println(
+								"<---> ERROR [Missing data after extract to staging]: " + dataFileName + dataFileType);
+						contentError.append("[idLog = " + idLog + "] [Missing data after extract to staging]: "
+								+ dataFileName + dataFileType + "\n");
+						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
+						MoveFile.moveFile(fileLocalFullPath, failDir);
+						continue;
+					}
+				} catch (SQLException e) {
+					TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
+					System.out.println("<---> ERROR [Load data into Staging] [Data file: " + dataFileName + dataFileType
+							+ "]: " + e.getMessage());
+					contentError.append("[idLog = " + idLog + "] [Load data into Staging] [Data file: " + dataFileName
+							+ dataFileType + "]: " + e.getMessage() + "\n");
+					UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
+					MoveFile.moveFile(fileLocalFullPath, failDir);
+					continue;
+				}
+				UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.SU);
 				TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
-				System.out.println("<---> ERROR [Load data into Staging] [Data file: " + dataFileName + dataFileType + "]: " + e.getMessage());
-				contentError.append("[idLog = " + idLog + "] [Load data into Staging] [Data file: " + dataFileName + dataFileType + "]: " + e.getMessage() + "\n");
-				UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF);
-				MoveFile.moveFile(fileLocalFullPath, failDir);
-				continue;
 			}
-			UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.SU);
-			TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
+		} else {
+			System.out.println("No File Data Found!!");
 		}
 		// Close connection
 		try {
@@ -165,13 +169,19 @@ public class MainProcess {
 		} catch (SQLException e) {
 			System.out.println("<---> ERROR [Close connection]: " + e.getMessage());
 		}
-		SendMail.sendMail(contentError.toString());
-		System.out.println("\n<p2> [Begin load data into Warehouse...]");
+
+		// Begin load data into Warehouse
+		System.out.println("\n<p2> [Load Data Into Warehouse]\n-------------------------------");
 		String fieldsInWH = "s_key," + fieldName + ",date_expired";
-		String tarTableWH = "tb_wh_" + dataObject;	
-		LoadDataToWarehouse.loadDataToWarehouse(infoConfig, dbStagingName, dbWarehouseName, tbWarehouseTempName, tarTableWH, fieldsInWH, exclusiveField);
+		String tarTableWH = "tb_wh_" + dataObject;
+		LoadDataToWarehouse.loadDataToWarehouse(infoConfig, dbStagingName, dbWarehouseName, tbWarehouseTempName,
+				tarTableWH, fieldsInWH, exclusiveField);
+		// Send notification
+		System.out.println("[Send ERROR message..]");
+		SendMail.sendMail(contentError.toString());
 	}
+
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException {
-		
+
 	}
 }

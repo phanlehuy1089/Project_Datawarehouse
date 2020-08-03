@@ -6,21 +6,21 @@ import download_file.LoadFileWithSCP;
 import etl.MainProcess;
 import model.InfoConfig;
 
-public class RunScript {
+public class RunProcess {
 	public static void run(int idConfig) {
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(idConfig);
 		String methodGetData = infoConfig.getMethodGetData();
 		switch (methodGetData) {
 		case "download":
-			System.out.println("[Begin download...]");
+			System.out.println("\n[Begin Download...]");
 			LoadFileWithSCP.downloadAllFile(infoConfig);
-			System.out.println("[Create list file data information]");
+			System.out.println("[Create List File Data Information]");
 			CreateInfoDataFile.insertInfoFileToTableLog(idConfig);
 			// Execute main process
 			MainProcess.loadDataWithConfigID(idConfig);
 			break;
 		case "local":
-			System.out.println("[Create list file data information]");
+			System.out.println("[Create List File Data Information]");
 			CreateInfoDataFile.insertInfoFileToTableLog(idConfig);
 			// Execute main process
 			MainProcess.loadDataWithConfigID(idConfig);
@@ -39,7 +39,7 @@ public class RunScript {
 				run(firstArg);
 				long millis2 = System.currentTimeMillis();
 				long distance = millis2 - millis1;
-				System.out.println("\n <End> [PROCESS TOTAL TIME]: " + distance + " milliseconds");
+				System.out.println("\n[PROCESS TOTAL TIME]: " + distance + " milliseconds");
 		    } catch (NumberFormatException e) {
 		        System.err.println("Argument <idConfig> " + args[0] + " must be an integer.");
 		        System.exit(1);

@@ -60,8 +60,6 @@ public class CreateInfoDataFile {
 				ps.setString(8, loadStatus);
 				ps.executeUpdate();
 			}
-			System.out
-					.println("[Get list file data information from folder: [" + localDir + "] insert into table Log]");
 			connection.close();
 		} catch (SQLException e) {
 
