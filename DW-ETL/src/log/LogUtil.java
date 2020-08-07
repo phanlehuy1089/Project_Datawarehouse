@@ -11,6 +11,7 @@ import mail.SendMail;
 import model.Log;
 
 public class LogUtil {
+	// Tạo danh sách chứa thông tin data file từ Log với trạng thái ER và idConfig tương ứng
 	public static ArrayList<Log> getListLog(int idConfig) {
 		ArrayList<Log> listLog = new ArrayList<Log>();
 		Connection connection = null;

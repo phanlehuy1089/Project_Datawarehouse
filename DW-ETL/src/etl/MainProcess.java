@@ -25,7 +25,7 @@ import log.LogUtil;
 public class MainProcess {
 
 	public static void loadDataWithConfigID(int idConfig) {
-		// Get configuration information
+		// Lấy thông tin Config thông qua idConfig
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(idConfig);
 		String dataObject = infoConfig.getDataObject();
 		String dbStagingName = infoConfig.getDbStagingName();
@@ -33,23 +33,25 @@ public class MainProcess {
 		String fileSuccessDir = infoConfig.getFileSuccessDir();
 		String fileFailDir = infoConfig.getFileFailDir();
 		String fieldName = infoConfig.getFieldName();
-		String exclusiveField = infoConfig.getExclusiveField();
+		String exclusiveField = infoConfig.getExclusiveField(); // trường duy nhất để phân biệt đối tượng
 		String fieldDelimiter = infoConfig.getFieldDelimiter();
 		String dateExpired = infoConfig.getDtExpired();
 		String tbStagingName = "tb_staging_" + dataObject;
 		String tbWarehouseTempName = "tb_wh_temp_" + dataObject;
-		// Note errorLogs
+		// ContentError ghi lại lỗi trong quá trình thực hiện process
 		StringBuffer contentError = new StringBuffer();
 		contentError.append("[idConfig = " + idConfig + "]\n--------------------\n");
-		// Get connection with databaseStaging
+		// Kết nối tới Database Staging
 		Connection connectionStaging = MySQLConnectionUtils.getConnection(infoConfig, dbStagingName);
 		PreparedStatement ps;
-		// Start process
+		// Bắt đầu load data
 		System.out.println("\n[EXECUTE ETL PROCESS] [dataObject = " + dataObject + "] [idConfig = " + idConfig + "]\n");
 		System.out.println("<p1> [Load Data Into Staging]");
+		// Lấy thông tin danh sách DataFile từ Log với trạng thái ER
 		ArrayList<Log> listLog = LogUtil.getListLog(idConfig);
+		// Kiểm tra danh sách rỗng
 		if (listLog.size() > 0) {
-			for (Log fileData : listLog) { // Get each file information from Log
+			for (Log fileData : listLog) { // Lấy thông tin của từng File
 				System.out.println("-----------------------------");
 				int idLog = fileData.getIdLog();
 				String fileLocalPath = fileData.getFileLocalPath();
@@ -58,15 +60,15 @@ public class MainProcess {
 
 				String fileLocalFullPath = fileLocalPath + "/" + dataFileName + dataFileType;
 
-				// Create file path for failFile or successFile
+				// Thư mục đường dẫn chứa File đã load thành công hoặc thất bại
 				String successDir = fileSuccessDir + "/" + dataFileName + dataFileType;
 				String failDir = fileFailDir + "/" + dataFileName + dataFileType;
-
+				
 				int dataLinesInTable = 0;
 
-				// Load file with some fileTypes using SWITCH CASE
+				// Load data với các định dạng khác nhau sử dụng SWITCH CASE
 				System.out.println("[Begin Load Data File] [idLog = " + idLog + "] " + dataFileName + dataFileType);
-
+				// Đường dẫn chính thức sử dụng để Load
 				String currentFile = "";
 				switch (dataFileType) {
 				case ".txt":
@@ -79,8 +81,10 @@ public class MainProcess {
 								+ e.getMessage() + "\n");
 						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
 						MoveFile.moveFile(fileLocalFullPath, failDir);
+						// trỏ đến file kế tiếp
 						continue;
 					}
+					// Gán currentFile bằng file text đã được Format
 					currentFile = txtFilePathTC;
 					break;
 				case ".csv":
@@ -97,11 +101,14 @@ public class MainProcess {
 								"[idLog = " + idLog + "] [Convert excel_file to txt_file]: " + e.getMessage() + "\n");
 						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
 						MoveFile.moveFile(fileLocalFullPath, failDir);
+						// trỏ đến file kế tiếp
 						continue;
 					}
+					// Gán currentFile bằng file excel đã được convert
 					currentFile = txtFilePath;
 					break;
 				default:
+					// Thông báo lỗi với định dạng khác
 					System.out.println(
 							"<---> ERROR [Load data into Staging] Cannot load with this fileType: " + dataFileType);
 					contentError
@@ -114,9 +121,10 @@ public class MainProcess {
 				/*
 				 * Load data in file with current file path
 				 */
-
+				
+				// Đếm số dòng dữ liệu từ File gốc (currentFile)
 				int dataLinesInFile = CheckData.numberDataLinesIgnoreFirst(currentFile);
-
+				// Load dữ liệu trực tiếp từ currentFile vào table Staging và các trường tương ứng
 				String sql = "LOAD DATA INFILE '" + currentFile + "' " + "INTO TABLE " + tbStagingName
 						+ " CHARACTER SET 'utf8' " + "FIELDS TERMINATED BY '" + fieldDelimiter + "' "
 						+ "ENCLOSED BY '\"' " + "LINES TERMINATED BY '\\r\\n' " + "IGNORE 1 LINES " + "(" + fieldName
@@ -124,22 +132,23 @@ public class MainProcess {
 				try {
 					ps = connectionStaging.prepareStatement(sql);
 					ps.executeUpdate();
-//				connection.close();
 
-					// Count data lines after extract
+					// Đếm số dòng dữ liệu sau khi extract (từ table Staging tương ứng)
 					dataLinesInTable = CheckData.numberDataLinesInTable(connectionStaging, dbStagingName,
 							tbStagingName);
 					System.out.println("[Data lines after extract to Staging]: "
 							+ dataLinesInTable);
-					// Update log when load data success or fail
+					// CheckSum - so sánh, đếm dữ liệu có bị thiếu hay không
 					if (dataLinesInTable == dataLinesInFile) {
-						// Begin load data to Warehouse temp
+						// Nếu đủ thì Load data từ table Staging vào table warehouse tạm tương ứng
 						LoadDataToWarehouseTemp.loadDataToWarehouseTemp(connectionStaging, dbStagingName, fieldName,
 								tbStagingName, tbWarehouseTempName, dateExpired);
 						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.TR);
+						// Transform
 						System.out.println("Load Data File Success!");
 						MoveFile.moveFile(fileLocalFullPath, successDir);
 					} else {
+						// Nếu không đủ thì Truncate table Staging, trỏ đến file kế tiếp
 						TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
 						System.out.println(
 								"<---> ERROR [Missing data after extract to staging]: " + dataFileName + dataFileType);
@@ -150,6 +159,7 @@ public class MainProcess {
 						continue;
 					}
 				} catch (SQLException e) {
+					// Lỗi extract dữ liệu vào Staging, truncate Staging và trỏ đến file kế tiếp
 					TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
 					System.out.println("<---> ERROR [Load data into Staging] [Data file: " + dataFileName + dataFileType
 							+ "]: " + e.getMessage());
@@ -159,30 +169,34 @@ public class MainProcess {
 					MoveFile.moveFile(fileLocalFullPath, failDir);
 					continue;
 				}
+				// Sau khi extract thành công thì update trạng thái là SU
 				UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.SU);
+				// Truncate table Staging để xử lý file kế tiếp
 				TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
 			}
 		} else {
 			System.out.println("No File Data Found!!");
 		}
-		// Close connection
+		// Đóng kết nối với Database Staging
 		try {
 			connectionStaging.close();
 		} catch (SQLException e) {
 			System.out.println("<---> ERROR [Close connection]: " + e.getMessage());
 		}
 
-		// Begin load data into Warehouse
+		// Bắt đầu load dữ liệu sang Database Warehouse
 		System.out.println("\n<p2> [Load Data Into Warehouse]\n-------------------------------");
+		// Thêm trường s_key và dt_expired
 		String fieldsInWH = "s_key," + fieldName + ",date_expired";
 		String tarTableWH = "tb_wh_" + dataObject;
+		// Chuyển data từ Table Warehouse Temp sang Table Warehouse chính thức
 		LoadDataToWarehouse.loadDataToWarehouse(infoConfig, dbStagingName, dbWarehouseName, tbWarehouseTempName,
 				tarTableWH, fieldsInWH, exclusiveField);
 		
-		// Update flag
+		// Update flag sau khi thực hiện process cho mỗi config
 		DBControlTool.updateConfigFlag(idConfig, "done");
 		
-		// Send notification
+		// Gửi thông báo lỗi vào email
 		System.out.println("[Send ERROR message..]");
 		SendMail.sendMail(contentError.toString());
 	}

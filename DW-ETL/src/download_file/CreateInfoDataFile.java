@@ -14,8 +14,9 @@ import log.LogStatus;
 import model.InfoConfig;
 
 public class CreateInfoDataFile {
-
+	// Liệt kê danh sách file từ Local Directory
 	public static ArrayList<String> listFileName(InfoConfig infoConfig) {
+		// Tạo danh sách chứa tên file (bao gồm định dạng)
 		ArrayList<String> listFileName = new ArrayList<String>();
 		String localDir = infoConfig.getLocalDirectory();
 		File dir = new File(localDir);
@@ -25,27 +26,30 @@ public class CreateInfoDataFile {
 		}
 		return listFileName;
 	}
-
+	
+	// Insert danh sách thông tin file vào Log với idConfig tương ứng
 	public static void insertInfoFileToTableLog(int idConfig) {
 
 		InfoConfig infoConfig = DBControlTool.getInfoConfig(idConfig);
 		String fieldDelimiter = infoConfig.getFieldDelimiter();
 		
 		String localDir = infoConfig.getLocalDirectory();
-//		idConfig = infoConfig.getIdConfig();
-
+		
+		// Lấy danh sách tên file
 		ArrayList<String> listFileInfo = CreateInfoDataFile.listFileName(infoConfig);
+		// Kết nối tới Database Control
 		Connection connection = MySQLConnectionUtils.getConnection(infoConfig, "db_control_etl");
+		// Insert vào Log và ghi lại thời gian hiện tại (current_time)
 		String sql = "INSERT INTO tb_log VALUES(?, ?, ?, ?, ?, ?, ?, current_timestamp(), ?)";
 		try {
 			PreparedStatement ps = connection.prepareStatement(sql);
 			for (String fileInfo : listFileInfo) {
-
+				// Ghép đường dẫn và tên file
 				File file = new File(localDir + "/" + fileInfo);
 
 				String loadStatus;
-				String[] fileArr = fileInfo.split("\\."); // split [filename].[filetype]
-				ps.setInt(1, 0);
+				String[] fileArr = fileInfo.split("\\."); // split [fileName].[fileType]
+				ps.setInt(1, 0); // idLog auto increment
 				ps.setInt(2, idConfig);
 				ps.setString(3, localDir);
 				ps.setString(4, fileArr[0]);
@@ -62,7 +66,6 @@ public class CreateInfoDataFile {
 			}
 			connection.close();
 		} catch (SQLException e) {
-
 			System.out.println(
 					"<---> ERROR [Get list file data information from folder: " + localDir + "]: " + e.getMessage());
 		}

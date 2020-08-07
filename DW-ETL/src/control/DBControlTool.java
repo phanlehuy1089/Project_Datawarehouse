@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import model.InfoConfig;
 
 public class DBControlTool {
+	// Lấy thông tin config thông qua idConfig
 	public static InfoConfig getInfoConfig(int idConfig) {
 		InfoConfig infoConfig = new InfoConfig();
 		Connection connection = null;
@@ -50,6 +51,7 @@ public class DBControlTool {
 		return infoConfig;
 	}
 	
+	// Update flag
 	public static void updateConfigFlag(int idConfig, String flag) {
 		String sql = "UPDATE tb_config SET flag = '"+flag+"' WHERE id_config = " + idConfig;
 		Connection connection = ConnectDBControlUtils.getDBControlConnection();
@@ -62,6 +64,7 @@ public class DBControlTool {
 		}
 	}
 	
+	// Check flag xem đã đủ điều kiện để chuyển Dim thành Fact hay chưa
 	public static boolean checkFlag(String methodGetData, String flag) {
 		boolean result = false;
 		String sql = "SELECT * FROM tb_config WHERE method_get_data = '"+methodGetData+"' AND flag = '"+flag+"' AND (data_object = 'dangky' OR data_object = 'sinhvien' OR data_object = 'lophoc')";
