@@ -25,16 +25,17 @@ public class InfoConfig {
 	String fileSuccessDir;
 	String fileFailDir;
 	String dtExpired;
+	String flag;
 
 	public InfoConfig() {
 		super();
 	}
-
+	
 	public InfoConfig(int idConfig, String methodGetData, String nasHostName, int nasPortNumber, String nasUserName,
 			String nasPassword, String nasDirectory, String localDirectory, String classForName, String portName,
 			int portNumber, String hostName, String userName, String password, String dbStagingName,
 			String dbWarehouseName, String dataObject, String fieldName, String fieldFormat, String exclusiveField,
-			String fieldDelimiter, String fileSuccessDir, String fileFailDir, String dtExpired) {
+			String fieldDelimiter, String fileSuccessDir, String fileFailDir, String dtExpired, String flag) {
 		super();
 		this.idConfig = idConfig;
 		this.methodGetData = methodGetData;
@@ -60,8 +61,9 @@ public class InfoConfig {
 		this.fileSuccessDir = fileSuccessDir;
 		this.fileFailDir = fileFailDir;
 		this.dtExpired = dtExpired;
+		this.flag = flag;
 	}
-
+	
 	public int getIdConfig() {
 		return idConfig;
 	}
@@ -254,6 +256,14 @@ public class InfoConfig {
 		this.dtExpired = dtExpired;
 	}
 
+	public String getFlag() {
+		return flag;
+	}
+
+	public void setFlag(String flag) {
+		this.flag = flag;
+	}
+
 	@Override
 	public String toString() {
 		return "[InfoConfig] \n idConfig = " + idConfig 
@@ -279,7 +289,8 @@ public class InfoConfig {
 				+ "\n fieldDelimiter = " + fieldDelimiter 
 				+ "\n fileSuccessDir = " + fileSuccessDir 
 				+ "\n fileFailDir = " + fileFailDir 
-				+ "\n dtExpired = " + dtExpired;
+				+ "\n dtExpired = " + dtExpired
+				+ "\n flag = " + flag;
 	}
 
 }

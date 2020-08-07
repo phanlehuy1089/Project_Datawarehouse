@@ -129,7 +129,7 @@ public class MainProcess {
 					// Count data lines after extract
 					dataLinesInTable = CheckData.numberDataLinesInTable(connectionStaging, dbStagingName,
 							tbStagingName);
-					System.out.println("[Data lines after extract to Staging] [" + dataFileName + dataFileType + "]: "
+					System.out.println("[Data lines after extract to Staging]: "
 							+ dataLinesInTable);
 					// Update log when load data success or fail
 					if (dataLinesInTable == dataLinesInFile) {
@@ -137,6 +137,7 @@ public class MainProcess {
 						LoadDataToWarehouseTemp.loadDataToWarehouseTemp(connectionStaging, dbStagingName, fieldName,
 								tbStagingName, tbWarehouseTempName, dateExpired);
 						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.TR);
+						System.out.println("Load Data File Success!");
 						MoveFile.moveFile(fileLocalFullPath, successDir);
 					} else {
 						TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
@@ -177,7 +178,10 @@ public class MainProcess {
 		String tarTableWH = "tb_wh_" + dataObject;
 		LoadDataToWarehouse.loadDataToWarehouse(infoConfig, dbStagingName, dbWarehouseName, tbWarehouseTempName,
 				tarTableWH, fieldsInWH, exclusiveField);
-			
+		
+		// Update flag
+		DBControlTool.updateConfigFlag(idConfig, "done");
+		
 		// Send notification
 		System.out.println("[Send ERROR message..]");
 		SendMail.sendMail(contentError.toString());

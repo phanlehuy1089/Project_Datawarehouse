@@ -41,6 +41,7 @@ public class DBControlTool {
 				infoConfig.setFileSuccessDir(rs.getString("file_success_dir"));
 				infoConfig.setFileFailDir(rs.getString("file_fail_dir"));
 				infoConfig.setDtExpired(rs.getString("dt_expired"));
+				infoConfig.setFlag(rs.getString("flag"));
 			}
 			connection.close();
 		} catch (SQLException e) {
@@ -48,8 +49,43 @@ public class DBControlTool {
 		}
 		return infoConfig;
 	}
-
+	
+	public static void updateConfigFlag(int idConfig, String flag) {
+		String sql = "UPDATE tb_config SET flag = '"+flag+"' WHERE id_config = " + idConfig;
+		Connection connection = ConnectDBControlUtils.getDBControlConnection();
+		try {
+			PreparedStatement ps = connection.prepareStatement(sql);
+			ps.executeUpdate();
+			connection.close();
+		} catch (SQLException e) {
+			System.out.println("<---> ERROR [Update Config Flag]: " + e.getMessage());
+		}
+	}
+	
+	public static boolean checkFlag(String methodGetData, String flag) {
+		boolean result = false;
+		String sql = "SELECT * FROM tb_config WHERE method_get_data = '"+methodGetData+"' AND flag = '"+flag+"' AND (data_object = 'dangky' OR data_object = 'sinhvien' OR data_object = 'lophoc')";
+		Connection connection = ConnectDBControlUtils.getDBControlConnection();
+		PreparedStatement ps;
+		int count = 0;
+		try {
+			ps = connection.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				count++;
+			}
+			connection.close();
+		} catch (SQLException e) {
+			System.out.println("<---> ERROR [Check Config Flag]: " + e.getMessage());
+		}
+		if (count == 3) {
+			result = true;
+		}		
+		return result;
+	}
+	
 	public static void main(String[] args) {
-		System.out.println(DBControlTool.getInfoConfig(1));
+//		System.out.println(DBControlTool.getInfoConfig(1));
+		System.out.println(checkFlag("local", "done"));
 	}
 }

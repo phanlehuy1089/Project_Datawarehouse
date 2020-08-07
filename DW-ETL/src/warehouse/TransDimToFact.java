@@ -51,7 +51,6 @@ public class TransDimToFact {
 		/*
 		 * TRANSFORM DIM TO FACT
 		 */
-		System.out.println("[Transform Dim To Fact]\n");
 		String dbWarehouseName = "db_warehouse_etl";
 		String tempFactTable = "fact_temp_dangky";
 		String factTable = "fact_dangky";
@@ -68,7 +67,7 @@ public class TransDimToFact {
 		// 3. Chuyển dim thành fact trong table Fact tạm
 		TransDimToFact.transDimToFact(connectionWarehouse, dbWarehouseName, tempFactTable, dimSinhVien, "ma_sv");
 		TransDimToFact.transDimToFact(connectionWarehouse, dbWarehouseName, tempFactTable, dimLopHoc, "ma_lh");
-		TransDimToFact.transDimToFact(connectionWarehouse, dbWarehouseName, tempFactTable, dimDate, "ma_ngay");
+		TransDimToFact.transDimToFact(connectionWarehouse, dbWarehouseName, tempFactTable, dimDate, "ngay_dk");
 		// 4. Chuyển data từ table Fact tạm sang Fact chính thức
 		TransDimToFact.transFactTempToFact(connectionWarehouse, dbWarehouseName, tempFactTable, factTable, factTempFields, factFields);
 		// 5. Đóng kết nối
