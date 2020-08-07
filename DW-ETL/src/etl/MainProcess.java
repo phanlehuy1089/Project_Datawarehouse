@@ -18,6 +18,7 @@ import tool.FormatDelimiterFileTxt;
 import tool.MoveFile;
 import tool.TruncateTable;
 import warehouse.LoadDataToWarehouse;
+import warehouse.TransDimToFact;
 import log.LogStatus;
 import log.LogUtil;
 
@@ -176,6 +177,7 @@ public class MainProcess {
 		String tarTableWH = "tb_wh_" + dataObject;
 		LoadDataToWarehouse.loadDataToWarehouse(infoConfig, dbStagingName, dbWarehouseName, tbWarehouseTempName,
 				tarTableWH, fieldsInWH, exclusiveField);
+			
 		// Send notification
 		System.out.println("[Send ERROR message..]");
 		SendMail.sendMail(contentError.toString());

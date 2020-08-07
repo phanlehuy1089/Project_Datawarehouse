@@ -36,7 +36,7 @@ public class RunProcess {
 		    try {
 		        firstArg = Integer.parseInt(args[0]);
 		        long millis1 = System.currentTimeMillis();
-				run(firstArg);
+				run(firstArg); // run with idConfig
 				long millis2 = System.currentTimeMillis();
 				long distance = millis2 - millis1;
 				System.out.println("\n[PROCESS TOTAL TIME]: " + distance + " milliseconds");
