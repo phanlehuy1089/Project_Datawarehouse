@@ -28,15 +28,15 @@ public class TransformData {
 		// Format date dạng YYYY-mm-dd sang dd/mm/YYYY
 		String regExFormDate1 = "^[0-9]{4}-(1[0-2]|0[1-9])-(3[0-1]|[1-2][0-9]|0[1-9])$";
 		Pattern pattern1 = Pattern.compile(regExFormDate1);
-		String sqlFormDate1 = "UPDATE "+fullTableName+" SET "+fieldDateName+" = date_format(str_to_date("+fieldDateName+",'%Y-%m-%d'),'%d/%m/%Y') WHERE "+fieldDateName+" <> '?'";
+		String sqlFormDate1 = "UPDATE "+fullTableName+" SET "+fieldDateName+" = date_format(str_to_date("+fieldDateName+",'%Y-%m-%d'),'%d/%m/%Y') WHERE "+fieldDateName+" <> '0'";
 		// Format date dạng d/m/YYYY sang dd/mm/YYYY
 		String regExFormDate2 = "^(3[0-1]|[1-2][0-9]|[1-9])/(1[0-2]|[1-9])/[0-9]{4}$";
 		Pattern pattern2 = Pattern.compile(regExFormDate2);
-		String sqlFormDate2 = "UPDATE "+fullTableName+" SET "+fieldDateName+" = date_format(str_to_date("+fieldDateName+",'%e/%c/%Y'),'%d/%m/%Y') WHERE "+fieldDateName+" <> '?'";
+		String sqlFormDate2 = "UPDATE "+fullTableName+" SET "+fieldDateName+" = date_format(str_to_date("+fieldDateName+",'%e/%c/%Y'),'%d/%m/%Y') WHERE "+fieldDateName+" <> '0'";
 		// Format date dạng mm/dd/YYYY sang dd/mm/YYYY
 		String regExFormDate3 = "^(1[0-2]|0[1-9])/(3[0-1]|[1-2][0-9]|0[1-9])/[0-9]{4}$";
 		Pattern pattern3 = Pattern.compile(regExFormDate3);
-		String sqlFormDate3 = "UPDATE "+fullTableName+" SET "+fieldDateName+" = date_format(str_to_date("+fieldDateName+",'%m/%d/%Y'),'%d/%m/%Y') WHERE "+fieldDateName+" <> '?'";
+		String sqlFormDate3 = "UPDATE "+fullTableName+" SET "+fieldDateName+" = date_format(str_to_date("+fieldDateName+",'%m/%d/%Y'),'%d/%m/%Y') WHERE "+fieldDateName+" <> '0'";
 		
 		// 
 		String sqlCheckDate = "SELECT "+fieldDateName+" FROM "+fullTableName+" LIMIT 1";

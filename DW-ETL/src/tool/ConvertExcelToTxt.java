@@ -80,11 +80,11 @@ public class ConvertExcelToTxt {
 					case BLANK:
 					case _NONE:
 					case ERROR:
-						data.append(delimiter + "?");
+						data.append(delimiter + "0");
 						break;
 					case STRING:
 						if (cell.getStringCellValue() == null || cell.getStringCellValue().equals("")) {
-							data.append(delimiter + "?");
+							data.append(delimiter + "0");
 						} else {
 							data.append(delimiter + cell.getStringCellValue());
 						}
@@ -106,7 +106,7 @@ public class ConvertExcelToTxt {
 						data.append(delimiter + evaluator.evaluate(cell).getStringValue());
 						break;
 					default:
-						data.append(delimiter + "?");
+						data.append(delimiter + "0");
 						break;
 					}
 				}
@@ -115,9 +115,9 @@ public class ConvertExcelToTxt {
 		}
 
 		String crlfData = data.toString().replaceAll("\n" + delimiter, "\r\n"); // Convert LF to CRLF
-		String perfectData = crlfData.replaceAll("\r\n\\?", "\r\n0");
+//		String perfectData = crlfData.replaceAll("\r\n\\?", "\r\n0");
 
-		StringBuilder perfectDataSB = new StringBuilder(perfectData);
+		StringBuilder perfectDataSB = new StringBuilder(crlfData);
 		perfectDataSB.deleteCharAt(0);
 
 		bw.write(perfectDataSB.toString());

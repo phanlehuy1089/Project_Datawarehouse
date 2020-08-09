@@ -27,8 +27,8 @@ public class FormatDelimiterFileTxt {
 			data.append(contentLine + "\r\n");
 		}
 		String content = data.toString().replaceAll("\\|", delimiter);
-		String content1 = content.replaceAll(delimiter+delimiter, delimiter+"?"+delimiter);
-		String content2 = content1.replaceAll(delimiter+"\r\n", delimiter+"?\r\n");
+		String content1 = content.replaceAll(delimiter+delimiter, delimiter+"0"+delimiter);
+		String content2 = content1.replaceAll(delimiter+"\r\n", delimiter+"0\r\n");
 //		System.out.println(content2);
 		bw.write(content2);
 		bw.flush();
@@ -40,7 +40,7 @@ public class FormatDelimiterFileTxt {
 
 	public static void main(String[] args) throws IOException {
 		long t1 = System.currentTimeMillis();
-		formatFileTxt("D:\\A\\sinhvien_chieu_nhom3_cc.txt", "D:\\A\\sinhvien_chieu_nhom3_2.txt", ";");
+		formatFileTxt("D:\\A\\sinhvien_chieu_nhom4.txt", "D:\\A\\sinhvien_chieu_nhom4_2.txt", ";");
 		long t2 = System.currentTimeMillis();
 		System.out.println("\n" + (t2 - t1));
 	}
