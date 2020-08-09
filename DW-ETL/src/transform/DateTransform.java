@@ -8,13 +8,13 @@ import org.apache.poi.ss.usermodel.DateUtil;
 
 public class DateTransform {
 	public static String transformDateInt(int dateInt) {
-		SimpleDateFormat formatter = new SimpleDateFormat("d/M/yyyy");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		Date javaDate = DateUtil.getJavaDate((double) dateInt);
 		String dateFormat = formatter.format(javaDate);
 		return dateFormat;
 	}
 	public static String transformDateString(String dateString) {
-		SimpleDateFormat formatter = new SimpleDateFormat("d/M/yyyy");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		Date javaDate = null;
 		String dateFormat = null;
 		try {
@@ -27,6 +27,6 @@ public class DateTransform {
 	}
 	
 	public static void main(String[] args) throws ParseException {
-		System.out.println(transformDateString("08/5/2020"));
+		System.out.println(transformDateString("1/31/2019"));
 	}
 }

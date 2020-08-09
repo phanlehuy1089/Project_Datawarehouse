@@ -13,12 +13,13 @@ import log.UpdateLog;
 import mail.SendMail;
 import model.InfoConfig;
 import model.Log;
+import tool.ConvertCsvToTxt;
 import tool.ConvertExcelToTxt;
 import tool.FormatDelimiterFileTxt;
 import tool.MoveFile;
 import tool.TruncateTable;
+import transform.TransformData;
 import warehouse.LoadDataToWarehouse;
-import warehouse.TransDimToFact;
 import log.LogStatus;
 import log.LogUtil;
 
@@ -66,10 +67,10 @@ public class MainProcess {
 				
 				int dataLinesInTable = 0;
 
-				// Load data với các định dạng khác nhau sử dụng SWITCH CASE
 				System.out.println("[Begin Load Data File] [idLog = " + idLog + "] " + dataFileName + dataFileType);
 				// Đường dẫn chính thức sử dụng để Load
 				String currentFile = "";
+				// Load data với các định dạng khác nhau sử dụng SWITCH CASE
 				switch (dataFileType) {
 				case ".txt":
 					String txtFilePathTC = "D:/MySQLFile/txtConvert/" + dataFileName + "_tc_" + idLog + ".txt";
@@ -88,7 +89,22 @@ public class MainProcess {
 					currentFile = txtFilePathTC;
 					break;
 				case ".csv":
-					currentFile = fileLocalFullPath;
+					String txtFilePathCC = "D:/MySQLFile/txtConvert/" + dataFileName + "_cc_" + idLog + ".txt";
+					
+					String copyCsvPath = fileLocalPath+"/"+dataFileName+"_copy"+dataFileType;
+					String txtPath = fileLocalPath+"/"+dataFileName+"_txt_converted"+dataFileType;
+					try {
+						ConvertCsvToTxt.convertCsvToTxt(fileLocalFullPath, copyCsvPath, txtPath, txtFilePathCC, ";");
+					} catch (IOException e) {
+						System.out.println("<---> ERROR [Format csv_file with delimiter ; ]: " + e.getMessage());
+						contentError.append("[idLog = " + idLog + "] [Format csv_file with delimiter ; ]: "
+								+ e.getMessage() + "\n");
+						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.EF); //
+						MoveFile.moveFile(fileLocalFullPath, failDir);
+						// trỏ đến file kế tiếp
+						continue;
+					}
+					currentFile = txtFilePathCC;
 					break;
 				case ".xls":
 				case ".xlsx":
@@ -140,15 +156,25 @@ public class MainProcess {
 							+ dataLinesInTable);
 					// CheckSum - so sánh, đếm dữ liệu có bị thiếu hay không
 					if (dataLinesInTable == dataLinesInFile) {
-						// Nếu đủ thì Load data từ table Staging vào table warehouse tạm tương ứng
+						// Nếu đủ thì tiến hành Transform dữ liệu và load data từ table Staging vào table warehouse tạm tương ứng
+//						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.TR);
+						// Transform
+						try {
+							TransformData.transformData(connectionStaging, dbStagingName, dataObject);
+						}
+						catch (SQLException e) {
+							System.out.println("<---> ERROR [Transform Data]: " + e.getMessage());
+							contentError.append("[idLog = " + idLog + "] [Transform Data] [" + dataFileName + dataFileType + "]: " + e.getMessage() + "\n");
+//							UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.TF);
+						}
+						// Load dữ liệu vào Warehouse tạm
 						LoadDataToWarehouseTemp.loadDataToWarehouseTemp(connectionStaging, dbStagingName, fieldName,
 								tbStagingName, tbWarehouseTempName, dateExpired);
-						UpdateLog.updateLog(idLog, dataLinesInTable, LogStatus.TR);
-						// Transform
+						
 						System.out.println("Load Data File Success!");
 						MoveFile.moveFile(fileLocalFullPath, successDir);
 					} else {
-						// Nếu không đủ thì Truncate table Staging, trỏ đến file kế tiếp
+						// Nếu data bị thiếu thì Truncate table Staging, trỏ đến file kế tiếp
 						TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
 						System.out.println(
 								"<---> ERROR [Missing data after extract to staging]: " + dataFileName + dataFileType);
@@ -175,7 +201,10 @@ public class MainProcess {
 				TruncateTable.truncateTable(connectionStaging, dbStagingName, tbStagingName);
 			}
 		} else {
+			// Nếu trong danh sách không có thông tin dataFile nào
 			System.out.println("No File Data Found!!");
+			// Dừng tiến trình
+			System.exit(0);
 		}
 		// Đóng kết nối với Database Staging
 		try {

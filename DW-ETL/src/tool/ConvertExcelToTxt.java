@@ -23,8 +23,8 @@ import transform.DateTransform;
 public class ConvertExcelToTxt {
 
 	public static void main(String[] args) throws IOException {
-		final String excelFilePath = "D:\\A\\sinhvien_chieu_nhom16.xlsx";
-		String txtFilePath = "D:\\A\\sinhvien_chieu_nhom16_text.txt";
+		final String excelFilePath = "D:\\A\\sinhvien_chieu_nhom3.xlsx";
+		String txtFilePath = "D:\\A\\sinhvien_chieu_nhom3_text.txt";
 //		final String excelFilePath = "D:\\A\\dangky_chieu_nhom4_2020.xlsx";
 //		String txtFilePath = "D:\\A\\dangky_chieu_nhom4_2020.txt";
 		convertExcelToTxt(excelFilePath, txtFilePath, ";");
@@ -80,10 +80,14 @@ public class ConvertExcelToTxt {
 					case BLANK:
 					case _NONE:
 					case ERROR:
-						data.append(delimiter + "0");
+						data.append(delimiter + "?");
 						break;
 					case STRING:
-						data.append(delimiter + cell.getStringCellValue());
+						if (cell.getStringCellValue() == null || cell.getStringCellValue().equals("")) {
+							data.append(delimiter + "?");
+						} else {
+							data.append(delimiter + cell.getStringCellValue());
+						}
 						break;
 					case NUMERIC:
 						if (HSSFDateUtil.isCellDateFormatted(cell)) {
@@ -102,7 +106,7 @@ public class ConvertExcelToTxt {
 						data.append(delimiter + evaluator.evaluate(cell).getStringValue());
 						break;
 					default:
-						data.append(delimiter + "0");
+						data.append(delimiter + "?");
 						break;
 					}
 				}
@@ -110,12 +114,11 @@ public class ConvertExcelToTxt {
 			data.append('\n');
 		}
 
-		String perfectData = data.toString().replaceAll("\n" + delimiter, "\r\n"); // Convert LF to CRLF
+		String crlfData = data.toString().replaceAll("\n" + delimiter, "\r\n"); // Convert LF to CRLF
+		String perfectData = crlfData.replaceAll("\r\n\\?", "\r\n0");
 
 		StringBuilder perfectDataSB = new StringBuilder(perfectData);
 		perfectDataSB.deleteCharAt(0);
-
-		System.out.println("[Convert] [" + excelFilePath + "] to [" + txtFilePath + "]");
 
 		bw.write(perfectDataSB.toString());
 		bw.flush(); //
@@ -123,6 +126,8 @@ public class ConvertExcelToTxt {
 		workbook.close();
 		inputStream.close();
 		bw.close();
+		
+		System.out.println("[Convert] [Excel File] To [Text File]");
 	}
 
 	// Get Workbook

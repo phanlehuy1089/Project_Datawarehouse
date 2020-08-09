@@ -1,8 +1,6 @@
 /META-INF/
-/warehouse/
-/run/
 /etl/
-/model/
-/control/
-/download_file/
+/transform/
+/tool/
+/warehouse/
 /log/

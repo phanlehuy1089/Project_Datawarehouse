@@ -27,15 +27,20 @@ public class FormatDelimiterFileTxt {
 			data.append(contentLine + "\r\n");
 		}
 		String content = data.toString().replaceAll("\\|", delimiter);
-		bw.write(content);
+		String content1 = content.replaceAll(delimiter+delimiter, delimiter+"?"+delimiter);
+		String content2 = content1.replaceAll(delimiter+"\r\n", delimiter+"?\r\n");
+//		System.out.println(content2);
+		bw.write(content2);
 		bw.flush();
 		br.close();
 		bw.close();
+		
+		System.out.println("[Format] [Txt File] with another delimiter");
 	}
 
 	public static void main(String[] args) throws IOException {
 		long t1 = System.currentTimeMillis();
-		formatFileTxt("D:\\A\\sinhvien_sang_nhom8.txt", "D:\\A\\sinhvien_sang_nhom8_2.txt", ";");
+		formatFileTxt("D:\\A\\sinhvien_chieu_nhom3_cc.txt", "D:\\A\\sinhvien_chieu_nhom3_2.txt", ";");
 		long t2 = System.currentTimeMillis();
 		System.out.println("\n" + (t2 - t1));
 	}
