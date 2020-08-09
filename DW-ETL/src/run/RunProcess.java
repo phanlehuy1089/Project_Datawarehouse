@@ -1,5 +1,7 @@
 package run;
 
+import java.util.Scanner;
+
 import control.DBControlTool;
 import download_file.CreateInfoDataFile;
 import download_file.LoadFileWithSCP;
@@ -49,19 +51,28 @@ public class RunProcess {
 	}
 
 	public static void main(String[] args) {
-		int firstArg;
-		if (args.length > 0) {
-			try {
-				firstArg = Integer.parseInt(args[0]);
-				long millis1 = System.currentTimeMillis();
-				run(firstArg); // run with idConfig
-				long millis2 = System.currentTimeMillis();
-				long distance = millis2 - millis1;
-				System.out.println("\n[PROCESS TOTAL TIME]: " + distance + " milliseconds");
-			} catch (NumberFormatException e) {
-				System.err.println("Argument <idConfig> " + args[0] + " must be an integer.");
-				System.exit(1);
-			}
-		}
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Enter ID Config: ");
+		int idConfig = sc.nextInt();
+		long t1 = System.currentTimeMillis();
+		RunProcess.run(idConfig);
+		long t2 = System.currentTimeMillis();
+		long distance = t2 - t1;
+		System.out.println("\n[PROCESS TOTAL TIME]: " + distance + " milliseconds");
+		
+//		int firstArg;
+//		if (args.length > 0) {
+//			try {
+//				firstArg = Integer.parseInt(args[0]);
+//				long millis1 = System.currentTimeMillis();
+//				run(firstArg); // run with idConfig
+//				long millis2 = System.currentTimeMillis();
+//				long distance = millis2 - millis1;
+//				System.out.println("\n[PROCESS TOTAL TIME]: " + distance + " milliseconds");
+//			} catch (NumberFormatException e) {
+//				System.err.println("Argument <idConfig> " + args[0] + " must be an integer.");
+//				System.exit(1);
+//			}
+//		}
 	}
 }
