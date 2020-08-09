@@ -37,7 +37,7 @@ public class ConvertCsvToTxt {
 		String content1 = content.replaceAll(delimiter+"\r\n", delimiter+"0\r\n");
 		String content2 = content1.replaceAll("\r\n"+delimiter, "\r\n0"+delimiter);
 		String content3 = content2.replaceAll(delimiter+delimiter, delimiter+"0"+delimiter);
-		System.out.println(content3);
+//		System.out.println(content3);
 		bw.write(content3);
 		bw.flush();
 		br.close();
