@@ -38,7 +38,7 @@ public class TransformData {
 		Pattern pattern3 = Pattern.compile(regExFormDate3);
 		String sqlFormDate3 = "UPDATE "+fullTableName+" SET "+fieldDateName+" = date_format(str_to_date("+fieldDateName+",'%m/%d/%Y'),'%d/%m/%Y') WHERE "+fieldDateName+" <> '0'";
 		
-		// 
+		// Lấy 1 mẫu Date Format từ table Staging
 		String sqlCheckDate = "SELECT "+fieldDateName+" FROM "+fullTableName+" LIMIT 1";
 		PreparedStatement ps = connection.prepareStatement(sqlCheckDate);
 		ResultSet rs = ps.executeQuery();

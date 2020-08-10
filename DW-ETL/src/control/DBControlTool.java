@@ -51,6 +51,24 @@ public class DBControlTool {
 		return infoConfig;
 	}
 	
+	// Check idConfig
+	public static boolean checkIdConfig(int idConfig) {
+		boolean result = false;
+		Connection connection = ConnectDBControlUtils.getDBControlConnection();
+		String sql = "SELECT * FROM tb_config WHERE id_config = ?";
+		try {
+			PreparedStatement ps = connection.prepareStatement(sql);
+			ps.setInt(1, idConfig);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				result = true;
+			}
+		} catch (SQLException e) {
+			System.out.println("<---> ERROR [Check ID Config]: " + e.getMessage());
+		}
+		return result;
+	}
+	
 	// Update flag
 	public static void updateConfigFlag(int idConfig, String flag) {
 		String sql = "UPDATE tb_config SET flag = '"+flag+"' WHERE id_config = " + idConfig;
@@ -89,6 +107,7 @@ public class DBControlTool {
 	
 	public static void main(String[] args) {
 //		System.out.println(DBControlTool.getInfoConfig(1));
-		System.out.println(checkFlag("local", "done"));
+//		System.out.println(checkFlag("local", "done"));
+		System.out.println(checkIdConfig(1));
 	}
 }

@@ -59,7 +59,7 @@ public class LoadFileWithSCP {
 	}
 
 	public static void main(String argv[]) {
-		InfoConfig infoConfig = DBControlTool.getInfoConfig(6);
+		InfoConfig infoConfig = DBControlTool.getInfoConfig(1);
 		downloadAllFile(infoConfig);
 		
 	}
